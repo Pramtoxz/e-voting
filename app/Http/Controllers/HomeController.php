@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Kandidat;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Home');
+        $kandidat = Kandidat::all();
+        return Inertia::render('Home', [
+            'kandidat' => $kandidat,
+        ]);
     }
 
     public function kandidatDetail($id)
