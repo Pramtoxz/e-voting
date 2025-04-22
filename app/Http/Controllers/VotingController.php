@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Kandidat;
 use App\Models\Vote;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -107,5 +108,36 @@ class VotingController extends Controller
         return Inertia::render('Voting/Thanks', [
             'vote' => $vote
         ]);
+    }
+
+    /**
+     * Mendapatkan daftar mahasiswa yang telah melakukan voting
+     */
+    public function getVotedStudents()
+    {
+        $votes = Vote::with(['user', 'kandidat'])
+            ->orderBy('created_at', 'desc')
+            ->take(20)
+            ->get()
+            ->map(function ($vote) {
+                // Format timestamp (created_at)
+                $timestamp = $vote->created_at->format('H:i');
+
+                // Mendapatkan fakultas dari username (contoh: jika format username mengandung kode fakultas)
+                // Ini hanya contoh, sesuaikan dengan struktur data yang sebenarnya
+                $faculty = "Mahasiswa";
+
+                return [
+                    'id' => $vote->id,
+                    'name' => $vote->user->name ?? $vote->username,
+                    'username' => $vote->username,
+                    'nomor_urut' => $vote->nomor_urut,
+                    'foto_bukti' => $vote->foto_bukti,
+                    'faculty' => $faculty,
+                    'timestamp' => $timestamp,
+                ];
+            });
+
+        return response()->json($votes);
     }
 }

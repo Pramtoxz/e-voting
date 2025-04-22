@@ -30,6 +30,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('voting', [VotingController::class, 'store'])->name('voting.store');
     Route::get('voting/thanks', [VotingController::class, 'thanks'])->name('voting.thanks');
 
+    // Route untuk menampilkan data mahasiswa yang telah voting
+    Route::get('/voted-students', [VotingController::class, 'getVotedStudents'])->name('voting.students');
+
     // Route untuk admin
     Route::middleware(['admin'])->group(function () {
         Route::resource('user', UserController::class);
