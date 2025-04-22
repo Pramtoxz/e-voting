@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\KandidatController;
+use App\Http\Controllers\HomeController;
 
 // Redirect root ke login
 Route::get('/', function () {
@@ -22,9 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('dashboard');
 
     // Route untuk semua user
-    Route::get('home', function () {
-        return Inertia::render('welcome');
-    })->name('home');
+    Route::get('home', [HomeController::class, 'index'])->name('home');
 
     // Route untuk admin
     Route::middleware(['admin'])->group(function () {
@@ -33,6 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+
 // Include file route lainnya
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
