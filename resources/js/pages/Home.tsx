@@ -1,17 +1,20 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Head } from "@inertiajs/react"
 import { CheckCircle, Clock, FileText, HelpCircle, Info, Shield, Users, Vote, X } from "lucide-react"
 import Layout from "@/Layout/MainLayout"
 import Button from "@/components/Button"
 import Card from "@/components/Card"
 import GarudaImage from "@/assets/garuda.webp"
+import axios from "axios"
 
 
 interface VotedStudent {
   id: number
   name: string
-  faculty: string
+  username: string
+  faculty: string 
   timestamp: string
+  foto_bukti?: string
 }
 
 
@@ -35,27 +38,102 @@ interface Props {
 
 
 export default function LandingPage({ kandidat }: Props) {
-  // Array of students who have voted (placeholder data)
-  const votedStudents: VotedStudent[] = [
-    { id: 1, name: "Ahmad Rizki", faculty: "Fakultas Teknik", timestamp: "08:15" },
-    { id: 2, name: "Siti Nurhaliza", faculty: "Fakultas Ekonomi", timestamp: "08:20" },
-    { id: 3, name: "Budi Santoso", faculty: "Fakultas Ilmu Komputer", timestamp: "08:25" },
-    { id: 4, name: "Dewi Kartika", faculty: "Fakultas Kedokteran", timestamp: "08:30" },
-    { id: 5, name: "Eko Prasetyo", faculty: "Fakultas Hukum", timestamp: "08:35" },
-    { id: 6, name: "Fitri Handayani", faculty: "Fakultas Psikologi", timestamp: "08:40" },
-    { id: 7, name: "Gunawan Wibisono", faculty: "Fakultas Teknik", timestamp: "08:45" },
-    { id: 8, name: "Hana Permata", faculty: "Fakultas MIPA", timestamp: "08:50" },
-    { id: 9, name: "Irfan Hakim", faculty: "Fakultas Ilmu Sosial", timestamp: "08:55" },
-    { id: 10, name: "Jihan Aulia", faculty: "Fakultas Sastra", timestamp: "09:00" },
-    { id: 11, name: "Kurniawan Adi", faculty: "Fakultas Teknik", timestamp: "09:05" },
-    { id: 12, name: "Laras Setiawati", faculty: "Fakultas Ekonomi", timestamp: "09:10" },
-  ]
+  // Array of students yang telah voting 
+  const [votedStudents, setVotedStudents] = useState<VotedStudent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch data mahasiswa yang telah voting
+  useEffect(() => {
+    const fetchVotedStudents = async () => {
+      try {
+        const response = await axios.get('/voted-students');
+        setVotedStudents(response.data);
+      } catch (error) {
+        console.error('Error fetching voted students:', error);
+        
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVotedStudents();
+  }, []);
+
+  // Tambahkan useEffect untuk periodic polling
+  useEffect(() => {
+    // Fungsi untuk memperbarui data voting setiap 15 detik
+    const intervalId = setInterval(() => {
+      const fetchVotedStudents = async () => {
+        try {
+          const response = await axios.get('/voted-students');
+          setVotedStudents(response.data);
+        } catch (error) {
+          console.error('Error fetching voted students:', error);
+          // Tidak perlu set data dummy karena sudah ada data sebelumnya
+        }
+      };
+
+      fetchVotedStudents();
+    }, 5000); // Refresh setiap 5 detik
+
+    // Cleanup function
+    return () => clearInterval(intervalId);
+  }, []);
 
   // State untuk dialog visi misi
   const [selectedKandidat, setSelectedKandidat] = useState<Kandidat | null>(null)
   const [showDialog, setShowDialog] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const [activeTab, setActiveTab] = useState<'visi' | 'misi'>('visi')
+
+  // State untuk animasi typing
+  const [typingText, setTypingText] = useState("")
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [loopNum, setLoopNum] = useState(0)
+  const [typingSpeed, setTypingSpeed] = useState(150)
+  
+  // Array teks yang akan diketik
+  const textArray = [
+    "Created By....",
+    "Rafi Chandra",
+    "Pramudito Metra",
+    "Follow Us On Instagram.....",
+    "@chandra_rafi",
+    "@pramuditometra"
+  ]
+  
+  // Effect untuk animasi typing
+  useEffect(() => {
+    const handleTyping = () => {
+      const i = loopNum % textArray.length
+      const fullText = textArray[i]
+      
+      setTypingText(
+        isDeleting 
+          ? fullText.substring(0, typingText.length - 1) 
+          : fullText.substring(0, typingText.length + 1)
+      )
+      
+      // Mengatur kecepatan typing
+      setTypingSpeed(isDeleting ? 50 : 150)
+      
+      // Jika selesai mengetik
+      if (!isDeleting && typingText === fullText) {
+        // Tunggu 2 detik sebelum mulai menghapus
+        setTimeout(() => setIsDeleting(true), 2000)
+      } 
+      // Jika selesai menghapus
+      else if (isDeleting && typingText === '') {
+        setIsDeleting(false)
+        setLoopNum(loopNum + 1)
+        // Tunggu 0.5 detik sebelum mengetik lagi
+        setTypingSpeed(500)
+      }
+    }
+    
+    const timer = setTimeout(handleTyping, typingSpeed)
+    return () => clearTimeout(timer)
+  }, [typingText, isDeleting, loopNum, typingSpeed, textArray])
 
   // Fungsi untuk membuka dialog
   const openDialog = (calon: Kandidat) => {
@@ -84,25 +162,24 @@ export default function LandingPage({ kandidat }: Props) {
   // URL untuk batik pattern
   const batikPatternUrl = "https://img.freepik.com/free-vector/white-organic-lines-seamless-pattern-brown-background_1409-4450.jpg?t=st=1745350003~exp=1745353603~hmac=9136d2f2846337b3ff161fd1128332e04d74e31db2eb4ca1a246022b4194f730&w=996"
   
-  // URL untuk gambar pahlawan nasional
-  // const pahlawanImages = {
-  //   soekarno: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Presiden_Sukarno.jpg/800px-Presiden_Sukarno.jpg",
-  //   hatta: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/VP_Hatta.jpg/800px-VP_Hatta.jpg",
-  //   kartini: "https://upload.wikimedia.org/wikipedia/commons/b/b0/COLLECTIE_TROPENMUSEUM_Portret_van_Raden_Ajeng_Kartini_TMnr_10018776.jpg",
-  //   diponegoro: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Diponegoro.jpg"
-  // }
-  
   // URL untuk gambar Garuda Pancasila
   const garudaUrl = "https://upload.wikimedia.org/wikipedia/commons/9/9c/Garuda_Pancasila%2C_Coat_of_Arms_of_Indonesia.svg"
 
   // URL untuk foto profil mahasiswa
-  const getInitialAvatar = (initial: string): string => `https://ui-avatars.com/api/?name=${initial}&background=ef4444&color=fff&size=100`
+  const getInitialAvatar = (student: VotedStudent): string => {
+    // Jika ada foto bukti, gunakan foto bukti
+    if (student.foto_bukti) {
+      return `/storage/${student.foto_bukti}`;
+    }
+    // Jika tidak ada, gunakan avatar dengan inisial
+    return `https://ui-avatars.com/api/?name=${student.name.charAt(0)}&background=ef4444&color=fff&size=100`;
+  }
 
   return (
     <>
       <Head title="PEMIRA 2025 - Pemilihan Raya Mahasiswa" />
 
-      {/* Inline CSS untuk animasi floating */}
+      {/* Inline CSS untuk animasi floating dan marquee */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes floating {
           0% { transform: translateY(0px); }
@@ -111,6 +188,30 @@ export default function LandingPage({ kandidat }: Props) {
         }
         .garuda-float {
           animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        
+        .animate-marquee {
+          animation: marquee 20s linear infinite;
+        }
+        
+        .animate-marquee2 {
+          animation: marquee 100s linear infinite;
+          animation-delay: 20s;
+        }
+
+        .marquee-item {
+          transition: all 0.3s ease;
+        }
+        
+        .marquee-item:hover {
+          transform: scale(1.05);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+          z-index: 10;
         }
       `}} />
 
@@ -166,6 +267,13 @@ export default function LandingPage({ kandidat }: Props) {
                     Lihat Kandidat
                   </Button>
                 </div>
+                
+                {/* Animasi Typing */}
+                <div className="mt-4 h-8">
+                  <p className="text-white font-bold text-xl typing-text-cursor overflow-hidden pr-1">
+                    {typingText}
+                  </p>
+                </div>
               </div>
               <div className="flex items-center justify-center">
                 <div className="relative w-full">
@@ -188,9 +296,9 @@ export default function LandingPage({ kandidat }: Props) {
             {/* Inspirational quote */}
             <div className="mt-12 text-center max-w-3xl mx-auto border-t border-b border-white/30 py-4">
               <p className="italic text-white/90">
-                "Bangsa yang besar adalah bangsa yang menghormati jasa pahlawannya"
+                "Jangan biarkan suara pendapat orang lain menenggelamkan suara hatimu sendiri."
               </p>
-              <p className="text-sm text-white/70 mt-1">— Ir. Soekarno</p>
+              <p className="text-sm text-white/70 mt-1">— Steve Jobs</p>
             </div>
           </div>
 
@@ -206,65 +314,50 @@ export default function LandingPage({ kandidat }: Props) {
         </section>
 
         {/* Infinite Marquee - Students who have voted */}
-        <section className="w-full py-6 bg-white overflow-hidden border-b border-red-100">
-          <div className="flex items-center gap-4 mb-2 px-4 md:px-6">
-            <div className="flex items-center gap-2 text-red-600 font-semibold">
-              <Vote className="h-5 w-5" />
+        <section className="w-full py-12 bg-white overflow-hidden border-b border-red-100">
+          <div className="flex items-center gap-4 mb-6 px-6 md:px-8">
+            <div className="flex items-center gap-3 text-red-600 font-bold text-2xl">
+              <Vote className="h-8 w-8" />
               <span>Mahasiswa yang telah memilih:</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>Update real-time</span>
+            <div className="flex items-center gap-3 text-lg text-muted-foreground">
+              <Clock className="h-6 w-6" />
+              <span>Update real-time setiap 5 detik</span>
             </div>
           </div>
 
-          {/* Marquee container */}
-          <div className="relative flex overflow-x-hidden">
-            {/* First marquee - original */}
-            <div className="animate-marquee whitespace-nowrap py-2 flex">
-              {votedStudents.map((student) => (
-                <div key={student.id} className="flex items-center mx-4">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-red-600 flex-shrink-0">
-                    <img
-                      src={getInitialAvatar(student.name.charAt(0))}
-                      alt={student.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <p className="font-medium text-sm">{student.name}</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <span>{student.faculty}</span>
-                      <span className="inline-block w-1 h-1 rounded-full bg-red-600 mx-1"></span>
-                      <span>{student.timestamp}</span>
-                    </p>
-                  </div>
+          {/* Marquee container with increased size */}
+          <div className="relative w-full overflow-hidden py-6">
+            {loading ? (
+              <div className="p-8 text-center w-full text-xl font-medium">Memuat data...</div>
+            ) : (
+              <div className="flex whitespace-nowrap">
+                <div className="animate-marquee py-6 flex">
+                  {votedStudents.map((student) => (
+                    <div 
+                      key={student.id} 
+                      className="flex items-center mx-8 px-6 py-4 bg-red-50 rounded-xl border border-red-200 marquee-item"
+                    >
+                      <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-red-600 flex-shrink-0 shadow-md">
+                        <img
+                          src={getInitialAvatar(student)}
+                          alt={student.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="ml-5 min-w-[200px]">
+                        <p className="font-bold text-xl text-gray-800">{student.name}</p>
+                        <p className="text-base text-gray-600 flex items-center gap-3 mt-1">
+                          <span className="font-medium">{student.faculty}</span>
+                          <span className="inline-block w-2 h-2 rounded-full bg-red-600"></span>
+                          <span>{student.timestamp}</span>
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-
-            {/* Second marquee - duplicate for seamless loop */}
-            <div className="animate-marquee2 whitespace-nowrap py-2 flex absolute top-0">
-              {votedStudents.map((student) => (
-                <div key={`dup-${student.id}`} className="flex items-center mx-4">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-red-600 flex-shrink-0">
-                    <img
-                      src={getInitialAvatar(student.name.charAt(0))}
-                      alt={student.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <p className="font-medium text-sm">{student.name}</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <span>{student.faculty}</span>
-                      <span className="inline-block w-1 h-1 rounded-full bg-red-600 mx-1"></span>
-                      <span>{student.timestamp}</span>
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -436,7 +529,7 @@ export default function LandingPage({ kandidat }: Props) {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl gap-6 py-12 lg:grid-cols-4">
+            <div className="mx-auto grid max-w-5xl gap-6 py-12 lg:grid-cols-3">
               <Card className="border-red-200 shadow-md hover:shadow-lg transition-all duration-300">
                 <div className="pt-6 p-6">
                   <div className="flex flex-col items-center space-y-4 text-center">
@@ -446,26 +539,13 @@ export default function LandingPage({ kandidat }: Props) {
                     <h3 className="text-xl font-bold text-red-700">Login</h3>
                     <p className="text-muted-foreground">Login menggunakan akun mahasiswa pada sistem PEMIRA.</p>
                   </div>
-                </div>
+                  </div>
               </Card>
               <Card className="border-red-200 shadow-md hover:shadow-lg transition-all duration-300">
                 <div className="pt-6 p-6">
                   <div className="flex flex-col items-center space-y-4 text-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-700 text-white">
                       <span className="text-2xl font-bold">2</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-red-700">Verifikasi</h3>
-                    <p className="text-muted-foreground">
-                      Verifikasi identitas menggunakan kode OTP yang dikirim ke email kampus.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-              <Card className="border-red-200 shadow-md hover:shadow-lg transition-all duration-300">
-                <div className="pt-6 p-6">
-                  <div className="flex flex-col items-center space-y-4 text-center">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-700 text-white">
-                      <span className="text-2xl font-bold">3</span>
                     </div>
                     <h3 className="text-xl font-bold text-red-700">Pilih Kandidat</h3>
                     <p className="text-muted-foreground">Pilih kandidat yang sesuai dengan aspirasi dan harapanmu.</p>
@@ -476,7 +556,7 @@ export default function LandingPage({ kandidat }: Props) {
                 <div className="pt-6 p-6">
                   <div className="flex flex-col items-center space-y-4 text-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-700 text-white">
-                      <span className="text-2xl font-bold">4</span>
+                      <span className="text-2xl font-bold">3</span>
                     </div>
                     <h3 className="text-xl font-bold text-red-700">Konfirmasi</h3>
                     <p className="text-muted-foreground">Konfirmasi pilihan dan dapatkan bukti voting digital.</p>
@@ -487,7 +567,7 @@ export default function LandingPage({ kandidat }: Props) {
             <div className="flex justify-center">
               <Button 
                 className="bg-red-700 hover:bg-red-800 text-white shadow-md transition-all duration-200 text-lg font-semibold px-8 py-3" 
-                href="#"
+                href={route('voting.index')}
               >
                 Voting Sekarang
               </Button>
@@ -512,26 +592,26 @@ export default function LandingPage({ kandidat }: Props) {
             </div>
             <div className="mx-auto max-w-3xl py-12">
               <div className="space-y-4">
-                <div className="rounded-lg border border-red-100 p-4">
-                  <h3 className="text-lg font-bold text-red-600">Siapa yang berhak memilih dalam PEMIRA?</h3>
-                  <p className="text-muted-foreground mt-1">
-                    Seluruh mahasiswa aktif yang terdaftar pada semester berjalan berhak memberikan suara dalam
-                    PEMIRA.
-                  </p>
-                </div>
-                <div className="rounded-lg border border-red-100 p-4">
-                  <h3 className="text-lg font-bold text-red-600">Apa saja persyaratan untuk menjadi kandidat?</h3>
-                  <p className="text-muted-foreground mt-1">
-                    Mahasiswa aktif minimal semester 3, IPK minimal 3.00, dan tidak pernah mendapat sanksi akademik.
-                  </p>
-                </div>
-                <div className="rounded-lg border border-red-100 p-4">
-                  <h3 className="text-lg font-bold text-red-600">Berapa lama masa jabatan ketua BEM?</h3>
-                  <p className="text-muted-foreground mt-1">
-                    Masa jabatan ketua BEM adalah 1 tahun terhitung sejak pelantikan.
-                  </p>
-                </div>
-              </div>
+                  <div className="rounded-lg border border-red-100 p-4">
+                    <h3 className="text-lg font-bold text-red-600">Siapa yang berhak memilih dalam PEMIRA?</h3>
+                    <p className="text-muted-foreground mt-1">
+                      Seluruh mahasiswa aktif yang terdaftar pada semester berjalan berhak memberikan suara dalam
+                      PEMIRA.
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-red-100 p-4">
+                    <h3 className="text-lg font-bold text-red-600">Apa saja persyaratan untuk menjadi kandidat?</h3>
+                    <p className="text-muted-foreground mt-1">
+                      Mahasiswa aktif minimal semester 3, IPK minimal 3.00, dan tidak pernah mendapat sanksi akademik.
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-red-100 p-4">
+                    <h3 className="text-lg font-bold text-red-600">Berapa lama masa jabatan ketua BEM?</h3>
+                    <p className="text-muted-foreground mt-1">
+                      Masa jabatan ketua BEM adalah 1 tahun terhitung sejak pelantikan.
+                    </p>
+                  </div>
+                  </div>
             </div>
           </div>
         </section>
@@ -731,7 +811,7 @@ export default function LandingPage({ kandidat }: Props) {
                     Tutup
                   </Button>
                 </div>
-              </div>
+          </div>
             </div>
             
             {/* Close button - top right */}
@@ -744,6 +824,22 @@ export default function LandingPage({ kandidat }: Props) {
           </div>
         </div>
       )}
+
+      {/* CSS untuk cursor */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .typing-text-cursor {
+            border-right: 4px solid white;
+            display: inline-block;
+            animation: blink 0.75s step-end infinite;
+          }
+          
+          @keyframes blink {
+            from, to { border-color: transparent }
+            50% { border-color: white; }
+          }
+        `
+      }} />
     </>
   )
 }

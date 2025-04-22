@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
                 'role' => 'admin',
             ]);
         }
-    
+
         // Cek apakah mahasiswa contoh sudah ada
         if (!User::where('email', '2010036@jayanusa.ac.id')->exists()) {
             User::create([
@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
             MahasiswaSeeder9::class,
             MahasiswaSeeder10::class,
             MahasiswaSeeder11::class,
+            VoteSeeder::class,
         ]);
     }
 }

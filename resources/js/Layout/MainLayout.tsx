@@ -1,7 +1,6 @@
 import React from "react"
 import { Link } from "@inertiajs/react"
 import { Flag } from "lucide-react"
-import Button from "@/components/Button"
 import logoJayanusa from "@/assets/jnputih.png"
 
 interface MainLayoutProps {
@@ -49,11 +48,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               FAQ
             </Link>
           </nav>
-          <div className="flex items-center gap-4">
-            <Button className="border-2 border-white text-red-700 hover:bg-gray-100 shadow-sm font-semibold" href="#voting">
-              Voting Sekarang
-            </Button>
-          </div>
+          
         </div>
       </header>
 
@@ -66,11 +61,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <Flag className="h-5 w-5" />
             <span>PEMIRA 2025</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <span className="text-sm">Countdown: 60 hari lagi</span>
-            </div>
-          </div>
+         
           <div className="flex gap-4 text-sm text-red-100">
             <Link href="#" className="hover:underline">
               Kontak
@@ -84,7 +75,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
           </div>
         </div>
         <div className="container mt-4 text-center text-xs text-red-100">
-          &copy; {new Date().getFullYear()} Komisi Pemilihan Mahasiswa. Hak Cipta Dilindungi.
+          &copy; {new Date().getFullYear()} Created by Rafi Chandra & Pramudito Metra.
         </div>
       </footer>
     </div>
