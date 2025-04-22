@@ -2,6 +2,7 @@ import React from "react"
 import { Link } from "@inertiajs/react"
 import { Flag } from "lucide-react"
 import Button from "@/components/Button"
+import logoJayanusa from "@/assets/jnputih.png"
 
 interface MainLayoutProps {
   children: React.ReactNode
@@ -16,16 +17,20 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <header className="sticky top-0 z-40 w-full border-b bg-red-700 text-white backdrop-blur supports-[backdrop-filter]:bg-red-700/95">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-xl">
-            <div className="relative w-8 h-8">
+            <div className="relative w-12 h-12">
               <div
-                className="absolute inset-0 bg-white"
+                className="absolute inset-0 "
                 style={{ clipPath: "polygon(0 0, 100% 0, 100% 50%, 0 50%)" }}
               ></div>
               <div
                 className="absolute inset-0 bg-red-700"
                 style={{ clipPath: "polygon(0 50%, 100% 50%, 100% 100%, 0 100%)" }}
               ></div>
-              <Flag className="absolute inset-0 h-6 w-6 m-1 text-red-700" />
+              <div className="absolute inset-0 m-1 flex items-center justify-center">
+                <div className="w-full flex items-center justify-center">
+                  <img src={logoJayanusa} alt="Jayanusa" className="h-24 w-auto object-contain" />
+                </div>
+              </div>
             </div>
             <span>PEMIRA 2025</span>
           </div>
@@ -39,9 +44,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <Link href="#kandidat" className="text-sm font-medium transition-colors hover:text-white hover:underline">
               Kandidat
             </Link>
-            <Link href="#jadwal" className="text-sm font-medium transition-colors hover:text-white hover:underline">
-              Jadwal
-            </Link>
+          
             <Link href="#faq" className="text-sm font-medium transition-colors hover:text-white hover:underline">
               FAQ
             </Link>

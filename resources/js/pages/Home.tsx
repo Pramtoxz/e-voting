@@ -4,6 +4,7 @@ import { CheckCircle, Clock, FileText, HelpCircle, Info, Shield, Users, Vote, X 
 import Layout from "@/Layout/MainLayout"
 import Button from "@/components/Button"
 import Card from "@/components/Card"
+import GarudaImage from "@/assets/garuda.webp"
 
 
 interface VotedStudent {
@@ -84,12 +85,12 @@ export default function LandingPage({ kandidat }: Props) {
   const batikPatternUrl = "https://img.freepik.com/free-vector/white-organic-lines-seamless-pattern-brown-background_1409-4450.jpg?t=st=1745350003~exp=1745353603~hmac=9136d2f2846337b3ff161fd1128332e04d74e31db2eb4ca1a246022b4194f730&w=996"
   
   // URL untuk gambar pahlawan nasional
-  const pahlawanImages = {
-    soekarno: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Presiden_Sukarno.jpg/800px-Presiden_Sukarno.jpg",
-    hatta: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/VP_Hatta.jpg/800px-VP_Hatta.jpg",
-    kartini: "https://upload.wikimedia.org/wikipedia/commons/b/b0/COLLECTIE_TROPENMUSEUM_Portret_van_Raden_Ajeng_Kartini_TMnr_10018776.jpg",
-    diponegoro: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Diponegoro.jpg"
-  }
+  // const pahlawanImages = {
+  //   soekarno: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Presiden_Sukarno.jpg/800px-Presiden_Sukarno.jpg",
+  //   hatta: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/VP_Hatta.jpg/800px-VP_Hatta.jpg",
+  //   kartini: "https://upload.wikimedia.org/wikipedia/commons/b/b0/COLLECTIE_TROPENMUSEUM_Portret_van_Raden_Ajeng_Kartini_TMnr_10018776.jpg",
+  //   diponegoro: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Diponegoro.jpg"
+  // }
   
   // URL untuk gambar Garuda Pancasila
   const garudaUrl = "https://upload.wikimedia.org/wikipedia/commons/9/9c/Garuda_Pancasila%2C_Coat_of_Arms_of_Indonesia.svg"
@@ -100,6 +101,18 @@ export default function LandingPage({ kandidat }: Props) {
   return (
     <>
       <Head title="PEMIRA 2025 - Pemilihan Raya Mahasiswa" />
+
+      {/* Inline CSS untuk animasi floating */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes floating {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+          100% { transform: translateY(0px); }
+        }
+        .garuda-float {
+          animation: floating 3s ease-in-out infinite;
+        }
+      `}} />
 
       <main className="flex-1">
         {/* Hero Section with Indonesian Heroes */}
@@ -155,54 +168,19 @@ export default function LandingPage({ kandidat }: Props) {
                 </div>
               </div>
               <div className="flex items-center justify-center">
-                <div className="relative w-full max-w-[500px] aspect-[4/3] rounded-lg overflow-hidden border-4 border-white shadow-lg">
+                <div className="relative w-full">
                   {/* Heroes Collage */}
-                  <div className="grid grid-cols-2 grid-rows-2 h-full w-full">
-                    <div className="relative">
-                      <img
-                        src={pahlawanImages.soekarno}
-                        alt="Soekarno"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                        <p className="text-white text-xs font-bold">Ir. Soekarno</p>
-                      </div>
-                    </div>
-                    <div className="relative">
-                      <img
-                        src={pahlawanImages.hatta}
-                        alt="Mohammad Hatta"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                        <p className="text-white text-xs font-bold">Mohammad Hatta</p>
-                      </div>
-                    </div>
-                    <div className="relative">
-                      <img
-                        src={pahlawanImages.kartini}
-                        alt="R.A. Kartini"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                        <p className="text-white text-xs font-bold">R.A. Kartini</p>
-                      </div>
-                    </div>
-                    <div className="relative">
-                      <img
-                        src={pahlawanImages.diponegoro}
-                        alt="Pangeran Diponegoro"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                        <p className="text-white text-xs font-bold">Pangeran Diponegoro</p>
+                  <div className="grid grid-cols-1 grid-rows-1 h-full w-full">
+                    <div className="relative flex justify-center">
+                      <div className="garuda-float">
+                        <img
+                          src={GarudaImage}
+                          alt="Garuda Pancasila"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                     </div>
                   </div>
-
-                  {/* Indonesian flag overlay */}
-                  <div className="absolute top-0 left-0 right-0 h-4 bg-red-600"></div>
-                  <div className="absolute bottom-0 left-0 right-0 h-4 bg-white"></div>
                 </div>
               </div>
             </div>

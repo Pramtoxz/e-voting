@@ -25,6 +25,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route untuk semua user
     Route::get('home', [HomeController::class, 'index'])->name('home');
 
+    // Route untuk voting
+    Route::get('voting', [VotingController::class, 'index'])->name('voting.index');
+    Route::post('voting', [VotingController::class, 'store'])->name('voting.store');
+    Route::get('voting/thanks', [VotingController::class, 'thanks'])->name('voting.thanks');
+
     // Route untuk admin
     Route::middleware(['admin'])->group(function () {
         Route::resource('user', UserController::class);
