@@ -114,7 +114,7 @@ export default function Login({ status }: LoginProps) {
     if (isLoading || isSubmitting) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-                <Head title="Login Portal Materi" />
+                <Head title="Login E-Voting" />
                 <div className="w-64 h-64">
                     <Lottie 
                         animationData={animationData} 
@@ -131,7 +131,7 @@ export default function Login({ status }: LoginProps) {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-[#1a1a1a] dark:via-[#0f1117] dark:to-black transition-all duration-500 p-4 sm:p-6 md:p-8">
-            <Head title="Login Portal Materi">
+            <Head title="Login E-Voting">
                 <link rel="preload" href={LogoJayanusa} as="image" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -154,10 +154,10 @@ export default function Login({ status }: LoginProps) {
                             />
                         </div>
                         <h1 className="text-white text-2xl font-bold text-center z-10">
-                            Portal Materi 
+                            E-Voting
                         </h1>
                         <p className="text-blue-100 text-sm mt-1 z-10">
-                            STMIK - AMIK JAYANUSA
+                           STMIK - AMIK JAYANUSA
                         </p>
                     </div>
 
