@@ -29,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route untuk admin
     Route::middleware(['admin'])->group(function () {
         Route::resource('user', UserController::class);
-        Route::resource('kandidat', KandidatController::class);
+        Route::resource('kandidat', KandidatController::class)->except(['show']);
     });
 });
 

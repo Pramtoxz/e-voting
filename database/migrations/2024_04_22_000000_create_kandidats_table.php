@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::create('kandidats', function (Blueprint $table) {
             $table->id();
-            $table->string('nomor_urut');
+            $table->string('nomor_urut')->unique();
             $table->string('nama_presiden');
             $table->string('nama_wakil');
             $table->enum('prodi_presiden', ['SI', 'MI', 'SK']);
             $table->enum('prodi_wakil', ['SI', 'MI', 'SK']);
-            $table->string('foto_presiden')->nullable();
-            $table->string('foto_wakil')->nullable();
-            $table->text('visi');
-            $table->text('misi');
-            $table->string('periode', 9); // Format: 2025/2026
+            $table->string('foto_presiden');
+            $table->string('foto_wakil');
+            $table->json('visi');
+            $table->json('misi');
+            $table->string('periode');
             $table->timestamps();
         });
     }
@@ -34,4 +34,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('kandidats');
     }
-};
+}; 

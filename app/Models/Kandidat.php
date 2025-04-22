@@ -13,6 +13,8 @@ class Kandidat extends Model
         'nomor_urut',
         'nama_presiden',
         'nama_wakil',
+        'nomor_bp_presiden',
+        'nomor_bp_wakil',
         'prodi_presiden',
         'prodi_wakil',
         'foto_presiden',
