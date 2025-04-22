@@ -6,6 +6,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -13,20 +14,40 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
-            'name' => 'Admin',
-            'username' => 'admin',
-            'email' => 'admin@jayanusa.ac.id',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-        ]);
+        // Cek apakah admin sudah ada
+        if (!User::where('email', 'admin@jayanusa.ac.id')->exists()) {
+            User::create([
+                'name' => 'Admin',
+                'username' => 'admin',
+                'email' => 'admin@jayanusa.ac.id',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+            ]);
+        }
     
-        User::create([
-            'name' => 'Mahasiswa',
-            'username' => '2010036',
-            'email' => '2010036@jayanusa.ac.id',
-            'password' => Hash::make('password'),
-            'role' => 'mahasiswa',
+        // Cek apakah mahasiswa contoh sudah ada
+        if (!User::where('email', '2010036@jayanusa.ac.id')->exists()) {
+            User::create([
+                'name' => 'Mahasiswa',
+                'username' => '2010036',
+                'email' => '2010036@jayanusa.ac.id',
+                'password' => Hash::make('password'),
+                'role' => 'mahasiswa',
+            ]);
+        }
+
+        $this->call([
+            MahasiswaSeeder1::class,
+            MahasiswaSeeder2::class,
+            MahasiswaSeeder3::class,
+            MahasiswaSeeder4::class,
+            MahasiswaSeeder5::class,
+            MahasiswaSeeder6::class,
+            MahasiswaSeeder7::class,
+            MahasiswaSeeder8::class,
+            MahasiswaSeeder9::class,
+            MahasiswaSeeder10::class,
+            MahasiswaSeeder11::class,
         ]);
     }
 }
