@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
+use App\Http\Controllers\VotingController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\KandidatController;
+
+// Redirect root ke login
+Route::get('/', function () {
+    return Redirect::route('login');
+});
+
+// Route untuk pengguna yang sudah login
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard untuk admin
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware('admin')
+        ->name('dashboard');
+
+    // Route untuk semua user
+    Route::get('home', function () {
+        return Inertia::render('welcome');
+    })->name('home');
+
+    // Route untuk admin
+    Route::middleware(['admin'])->group(function () {
+        Route::resource('user', UserController::class);
+        Route::resource('kandidat', KandidatController::class);
+    });
+});
+
+// Include file route lainnya
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';
