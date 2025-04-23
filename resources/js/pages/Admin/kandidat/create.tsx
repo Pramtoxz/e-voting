@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { useEffect } from 'react';
 
 type FormData = {
     nomor_urut: string;
+    nama: string;
     nama_presiden: string;
     nama_wakil: string;
     nomor_bp_presiden: string;
@@ -35,6 +37,7 @@ export default function Create() {
     const { toast } = useToast();
     const form = useForm<FormData>({
         nomor_urut: '',
+        nama: '',
         nama_presiden: '',
         nama_wakil: '',
         nomor_bp_presiden: '',
@@ -50,9 +53,18 @@ export default function Create() {
         periode: '',
     });
 
+    // Effect untuk set nama berdasarkan nama presiden dan wakil
+    useEffect(() => {
+        if (form.data.nama_presiden && form.data.nama_wakil) {
+            const pasangan = `${form.data.nama_presiden} & ${form.data.nama_wakil}`;
+            form.setData('nama', pasangan);
+        }
+    }, [form.data.nama_presiden, form.data.nama_wakil]);
+
     function onSubmit(e: React.FormEvent) {
         e.preventDefault();
         form.post(route('kandidat.store'), {
+            forceFormData: true, // Paksa gunakan FormData untuk upload file
             onSuccess: () => {
                 toast({
                     title: "Berhasil!",
@@ -60,10 +72,11 @@ export default function Create() {
                     variant: "success",
                 });
             },
-            onError: () => {
+            onError: (errors) => {
+                console.error(errors);
                 toast({
                     title: "Error!",
-                    description: "Gagal menambahkan kandidat",
+                    description: "Gagal menambahkan kandidat. Periksa form Anda.",
                     variant: "destructive",
                 });
             },
@@ -115,7 +128,11 @@ export default function Create() {
                                             value={form.data.nomor_urut}
                                             onChange={e => form.setData('nomor_urut', e.target.value)}
                                             placeholder="Masukkan nomor urut"
+                                            className={form.errors.nomor_urut ? "border-destructive" : ""}
                                         />
+                                        {form.errors.nomor_urut && (
+                                            <p className="text-xs text-destructive mt-1">{form.errors.nomor_urut}</p>
+                                        )}
                                     </div>
 
                                     <div className="space-y-2">
@@ -124,8 +141,12 @@ export default function Create() {
                                             id="periode"
                                             value={form.data.periode}
                                             onChange={e => form.setData('periode', e.target.value)}
-                                            placeholder="Masukkan periode"
+                                            placeholder="Contoh: 2025/2026"
+                                            className={form.errors.periode ? "border-destructive" : ""}
                                         />
+                                        {form.errors.periode && (
+                                            <p className="text-xs text-destructive mt-1">{form.errors.periode}</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -146,7 +167,11 @@ export default function Create() {
                                                 value={form.data.nama_presiden}
                                                 onChange={e => form.setData('nama_presiden', e.target.value)}
                                                 placeholder="Masukkan nama presiden"
+                                                className={form.errors.nama_presiden ? "border-destructive" : ""}
                                             />
+                                            {form.errors.nama_presiden && (
+                                                <p className="text-xs text-destructive mt-1">{form.errors.nama_presiden}</p>
+                                            )}
                                         </div>
 
                                         <div className="space-y-2">
@@ -156,7 +181,11 @@ export default function Create() {
                                                 value={form.data.nomor_bp_presiden}
                                                 onChange={e => form.setData('nomor_bp_presiden', e.target.value)}
                                                 placeholder="Masukkan nomor BP"
+                                                className={form.errors.nomor_bp_presiden ? "border-destructive" : ""}
                                             />
+                                            {form.errors.nomor_bp_presiden && (
+                                                <p className="text-xs text-destructive mt-1">{form.errors.nomor_bp_presiden}</p>
+                                            )}
                                         </div>
 
                                         <div className="space-y-2">
@@ -165,7 +194,7 @@ export default function Create() {
                                                 value={form.data.prodi_presiden}
                                                 onValueChange={value => form.setData('prodi_presiden', value)}
                                             >
-                                                <SelectTrigger>
+                                                <SelectTrigger className={form.errors.prodi_presiden ? "border-destructive" : ""}>
                                                     <SelectValue placeholder="Pilih program studi" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -186,11 +215,14 @@ export default function Create() {
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                            {form.errors.prodi_presiden && (
+                                                <p className="text-xs text-destructive">{form.errors.prodi_presiden}</p>
+                                            )}
                                         </div>
                                     </div>
 
                                     <div className="w-full sm:w-1/3 space-y-2">
-                                        <Label htmlFor="foto_presiden" className="italic">Foto 3x4</Label>
+                                        <Label htmlFor="foto_presiden" className="italic">Foto 3x4 <span className="text-destructive">*</span></Label>
                                         <div className="relative flex flex-col items-center p-4 border-2 border-dashed rounded-lg">
                                             {form.data.foto_presiden_preview ? (
                                                 <div className="space-y-4">
@@ -240,6 +272,9 @@ export default function Create() {
                                                 accept="image/*"
                                                 className="hidden"
                                             />
+                                            {form.errors.foto_presiden && (
+                                                <p className="text-xs text-destructive mt-2">{form.errors.foto_presiden}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -261,7 +296,11 @@ export default function Create() {
                                                 value={form.data.nama_wakil}
                                                 onChange={e => form.setData('nama_wakil', e.target.value)}
                                                 placeholder="Masukkan nama wakil"
+                                                className={form.errors.nama_wakil ? "border-destructive" : ""}
                                             />
+                                            {form.errors.nama_wakil && (
+                                                <p className="text-xs text-destructive mt-1">{form.errors.nama_wakil}</p>
+                                            )}
                                         </div>
 
                                         <div className="space-y-2">
@@ -271,7 +310,11 @@ export default function Create() {
                                                 value={form.data.nomor_bp_wakil}
                                                 onChange={e => form.setData('nomor_bp_wakil', e.target.value)}
                                                 placeholder="Masukkan nomor BP"
+                                                className={form.errors.nomor_bp_wakil ? "border-destructive" : ""}
                                             />
+                                            {form.errors.nomor_bp_wakil && (
+                                                <p className="text-xs text-destructive mt-1">{form.errors.nomor_bp_wakil}</p>
+                                            )}
                                         </div>
 
                                         <div className="space-y-2">
@@ -280,7 +323,7 @@ export default function Create() {
                                                 value={form.data.prodi_wakil}
                                                 onValueChange={value => form.setData('prodi_wakil', value)}
                                             >
-                                                <SelectTrigger>
+                                                <SelectTrigger className={form.errors.prodi_wakil ? "border-destructive" : ""}>
                                                     <SelectValue placeholder="Pilih program studi" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -301,11 +344,14 @@ export default function Create() {
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                            {form.errors.prodi_wakil && (
+                                                <p className="text-xs text-destructive">{form.errors.prodi_wakil}</p>
+                                            )}
                                         </div>
                                     </div>
 
                                     <div className="w-full sm:w-1/3 space-y-2">
-                                        <Label htmlFor="foto_wakil" className="italic">Foto 3x4</Label>
+                                        <Label htmlFor="foto_wakil" className="italic">Foto 3x4 <span className="text-destructive">*</span></Label>
                                         <div className="relative flex flex-col items-center p-4 border-2 border-dashed rounded-lg">
                                             {form.data.foto_wakil_preview ? (
                                                 <div className="space-y-4">
@@ -355,6 +401,9 @@ export default function Create() {
                                                 accept="image/*"
                                                 className="hidden"
                                             />
+                                            {form.errors.foto_wakil && (
+                                                <p className="text-xs text-destructive mt-2">{form.errors.foto_wakil}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -375,11 +424,15 @@ export default function Create() {
                                             value={form.data.visi}
                                             onChange={e => form.setData('visi', e.target.value)}
                                             placeholder="Masukkan visi (satu per baris)"
-                                            className="min-h-[100px]"
+                                            className={`min-h-[100px] ${form.errors.visi ? "border-destructive" : ""}`}
                                         />
-                                        <p className="text-xs text-muted-foreground">
-                                            Pisahkan setiap visi dengan baris baru (Enter)
-                                        </p>
+                                        {form.errors.visi ? (
+                                            <p className="text-xs text-destructive">{form.errors.visi}</p>
+                                        ) : (
+                                            <p className="text-xs text-muted-foreground">
+                                                Pisahkan setiap visi dengan baris baru (Enter)
+                                            </p>
+                                        )}
                                     </div>
 
                                     <div className="space-y-2">
@@ -389,11 +442,15 @@ export default function Create() {
                                             value={form.data.misi}
                                             onChange={e => form.setData('misi', e.target.value)}
                                             placeholder="Masukkan misi (satu per baris)"
-                                            className="min-h-[100px]"
+                                            className={`min-h-[100px] ${form.errors.misi ? "border-destructive" : ""}`}
                                         />
-                                        <p className="text-xs text-muted-foreground">
-                                            Pisahkan setiap misi dengan baris baru (Enter)
-                                        </p>
+                                        {form.errors.misi ? (
+                                            <p className="text-xs text-destructive">{form.errors.misi}</p>
+                                        ) : (
+                                            <p className="text-xs text-muted-foreground">
+                                                Pisahkan setiap misi dengan baris baru (Enter)
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </div>

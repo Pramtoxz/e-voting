@@ -108,10 +108,7 @@ export default function Kuesioner({ hasSubmitted, kuesioner, errors, flash }: Ku
     }
   }
   
-  // Fungsi untuk memulai pengalaman tanpa musik
-  const startExperienceWithoutMusic = () => {
-    setShowWelcomeDialog(false)
-  }
+ 
   
   // Toggle untuk musik
   const toggleMusic = () => {
@@ -504,7 +501,7 @@ export default function Kuesioner({ hasSubmitted, kuesioner, errors, flash }: Ku
             </div>
             <h2 className="text-2xl font-bold text-center text-red-600 mt-2">Selamat Datang!</h2>
             <p className="text-center text-gray-600 mt-3">
-              Kami ingin mendengar pendapat Anda tentang aplikasi e-Vote ini. Masukan Anda sangat berharga untuk pengembangan kami ke depannya.
+              Kami ingin mendengar pendapat Anda tentang aplikasi Pewira Jayanusa. Masukan Anda sangat berharga untuk pengembangan kami ke depannya.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 mt-6">
@@ -518,14 +515,7 @@ export default function Kuesioner({ hasSubmitted, kuesioner, errors, flash }: Ku
                   <circle cx="6" cy="18" r="3"></circle>
                   <circle cx="18" cy="16" r="3"></circle>
                 </svg>
-                Mulai dengan Musik
-              </button>
-              
-              <button
-                className="welcome-button welcome-skip-button py-3 px-4 rounded-lg text-white font-semibold flex-1"
-                onClick={startExperienceWithoutMusic}
-              >
-                Lewati Musik
+                Mulai Kuesioner
               </button>
             </div>
             
