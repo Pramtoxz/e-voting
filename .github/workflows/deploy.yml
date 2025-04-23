@@ -61,6 +61,9 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_ROOT_DIR }}/
+          protocol: ftp
+          port: 21
+          state: false
           exclude: |
             **/.git*
             **/.git*/**
@@ -71,5 +74,6 @@ jobs:
             phpunit.xml
             package-lock.json
             tests/**
+            storage/**
+            bootstrap/cache/**
           log-level: verbose
-          dangerous-clean-slate: true

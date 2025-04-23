@@ -12,8 +12,24 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-    public function run()
+    public function run(): void
     {
+        // Pengaturan dasar aplikasi
+        \App\Models\Setting::create([
+            'key' => 'show_voting_results',
+            'value' => '0',
+        ]);
+
+        \App\Models\Setting::create([
+            'key' => 'countdown_active',
+            'value' => '1',
+        ]);
+
+        \App\Models\Setting::create([
+            'key' => 'countdown_end_time',
+            'value' => now()->addMinutes(10)->format('Y-m-d H:i:s'),
+        ]);
+
         // Cek apakah admin sudah ada
         if (!User::where('email', 'admin@jayanusa.ac.id')->exists()) {
             User::create([
