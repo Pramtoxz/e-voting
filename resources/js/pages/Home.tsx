@@ -333,7 +333,7 @@ export default function LandingPage({ kandidat }: Props) {
             ) : (
               <div className="flex whitespace-nowrap">
                 <div className="animate-marquee py-6 flex">
-                  {votedStudents.map((student) => (
+              {votedStudents.map((student) => (
                     <div 
                       key={student.id} 
                       className="flex items-center mx-8 px-6 py-4 bg-red-50 rounded-xl border border-red-200 marquee-item"
@@ -341,21 +341,21 @@ export default function LandingPage({ kandidat }: Props) {
                       <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-red-600 flex-shrink-0 shadow-md">
                         <img
                           src={getInitialAvatar(student)}
-                          alt={student.name}
+                      alt={student.name}
                           className="w-full h-full object-cover"
-                        />
-                      </div>
+                    />
+                  </div>
                       <div className="ml-5 min-w-[200px]">
                         <p className="font-bold text-xl text-gray-800">{student.name}</p>
                         <p className="text-base text-gray-600 flex items-center gap-3 mt-1">
                           <span className="font-medium">{student.faculty}</span>
                           <span className="inline-block w-2 h-2 rounded-full bg-red-600"></span>
-                          <span>{student.timestamp}</span>
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                      <span>{student.timestamp}</span>
+                    </p>
+                  </div>
                 </div>
+              ))}
+            </div>
               </div>
             )}
           </div>

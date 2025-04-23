@@ -3,7 +3,7 @@ import { Head, useForm } from "@inertiajs/react"
 import Layout from "@/Layout/MainLayout"
 import Button from "@/components/Button"
 import Card from "@/components/Card"
-import { ChevronLeft, HelpCircle, Star, CheckCircle, Send, Shield, Clock, Github, Instagram } from "lucide-react"
+import { HelpCircle, Star, CheckCircle, Send, Shield, Clock, Github, Instagram } from "lucide-react"
 // Import foto developer
 import RafiImage from "@/assets/rafi.jpg"
 import DitoImage from "@/assets/dito.jpg"
@@ -556,17 +556,7 @@ export default function Kuesioner({ hasSubmitted, kuesioner, errors, flash }: Ku
 
       <div className="py-6 sm:py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 sm:mb-8">
-            <Button 
-              href={route('home')} 
-              variant="ghost" 
-              className="text-red-700 hover:bg-red-50"
-            >
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Kembali ke Beranda</span>
-              <span className="sm:hidden">Kembali</span>
-            </Button>
-          </div>
+       
 
           {/* Informasi Developer - Dipindahkan ke paling atas */}
           <div className="mb-12">
