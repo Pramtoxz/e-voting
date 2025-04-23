@@ -483,18 +483,10 @@
                     <li>Pastikan koneksi internet stabil</li>
                 </ul>
             </div>
-            
-            <div class="buttons">
-                <a href="#" class="button">
-                    <span>Informasi Kandidat</span>
-                </a>
-                <a href="#" class="outline-button">
-                    <span>Petunjuk Voting</span>
-                </a>
-            </div>
+        
             
             <div class="developer-info">
-                &copy; {{ date('Y') }} STMIK - AMIK JAYANUSA<br>
+                &copy; {{ date('Y') }}
                 Developed by Pramudito Metra & Rafi Chandra
             </div>
         </div>
