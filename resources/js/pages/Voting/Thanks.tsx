@@ -1,6 +1,6 @@
-import React from "react"
-import { Head, Link } from "@inertiajs/react"
-import { CheckCircle, ChevronLeft, Shield } from "lucide-react"
+import React, { useEffect } from "react"
+import { Head, Link, router } from "@inertiajs/react"
+import { CheckCircle, Shield } from "lucide-react"
 import Layout from "@/Layout/MainLayout"
 import Button from "@/components/Button"
 
@@ -19,6 +19,16 @@ interface ThanksProps {
 }
 
 export default function Thanks({ vote }: ThanksProps) {
+  useEffect(() => {
+    const redirectTimer = setTimeout(() => {
+      router.visit(route('kuesioner.index'), { 
+        onFinish: () => console.log('Redirect ke kuesioner selesai')
+      });
+    }, 3000);
+
+    return () => clearTimeout(redirectTimer);
+  }, []);
+
   return (
     <>
       <Head title="Terima Kasih - PEMIRA 2025" />
@@ -37,6 +47,9 @@ export default function Thanks({ vote }: ThanksProps) {
               </h1>
               <p className="max-w-[700px] text-green-100 md:text-xl/relaxed">
                 Suara Anda telah berhasil direkam. Terima kasih telah berpartisipasi dalam PEMIRA 2025.
+              </p>
+              <p className="text-green-100 md:text-lg/relaxed">
+                Halaman akan dialihkan ke kuesioner dalam 3 detik...
               </p>
             </div>
           </div>
@@ -108,9 +121,9 @@ export default function Thanks({ vote }: ThanksProps) {
               </div>
 
               <div className="flex justify-center mt-8 border-t border-gray-200 pt-6">
-                <Link href={route('home')}>
+                <Link href={route('kuesioner.index')}>
                   <Button className="bg-red-700 hover:bg-red-800 text-white">
-                    <ChevronLeft className="mr-2 h-4 w-4" /> Kembali ke Beranda
+                    Ke Halaman Kuesioner
                   </Button>
                 </Link>
               </div>

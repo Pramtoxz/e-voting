@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Head } from "@inertiajs/react"
-import { CheckCircle, Clock, FileText, HelpCircle, Info, Shield, Users, Vote, X } from "lucide-react"
+import { Head, Link } from "@inertiajs/react"
+import { CheckCircle, Clock, FileText, HelpCircle, Info, Shield, Users, Vote, X, LogOut } from "lucide-react"
 import Layout from "@/Layout/MainLayout"
 import Button from "@/components/Button"
 import Card from "@/components/Card"
@@ -32,12 +32,21 @@ interface Kandidat {
   misi: string
 }
 
+interface UserProps {
+  id: number;
+  name: string;
+  email: string;
+  avatar?: string;
+  username?: string;
+}
+
 interface Props { 
   kandidat: Kandidat[]
+  auth: { user: UserProps }
 }
 
 
-export default function LandingPage({ kandidat }: Props) {
+export default function LandingPage({ kandidat, auth }: Props) {
   // Array of students yang telah voting 
   const [votedStudents, setVotedStudents] = useState<VotedStudent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -175,6 +184,31 @@ export default function LandingPage({ kandidat }: Props) {
     return `https://ui-avatars.com/api/?name=${student.name.charAt(0)}&background=ef4444&color=fff&size=100`;
   }
 
+  // State untuk dialog user profile
+  const [showUserDialog, setShowUserDialog] = useState(false);
+
+  // Fungsi untuk mendapatkan inisial dari nama user untuk avatar default
+  const getUserInitials = () => {
+    if (!auth?.user?.name) return "U";
+    return auth.user.name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  // Fungsi untuk mendapatkan warna background acak untuk avatar default
+  const getAvatarBgColor = () => {
+    const colors = [
+      "bg-red-500", "bg-blue-500", "bg-green-500", 
+      "bg-yellow-500", "bg-purple-500", "bg-indigo-500"
+    ];
+    // Gunakan ID user untuk mendapatkan warna yang konsisten
+    const colorIndex = auth?.user?.id % colors.length || 0;
+    return colors[colorIndex];
+  };
+
   return (
     <>
       <Head title="PEMIRA 2025 - Pemilihan Raya Mahasiswa" />
@@ -214,6 +248,86 @@ export default function LandingPage({ kandidat }: Props) {
           z-index: 10;
         }
       `}} />
+
+      {/* User Profile Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <button 
+          onClick={() => setShowUserDialog(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-white/90 border border-red-200 shadow-md hover:shadow-lg text-red-700 transition-all duration-300"
+        >
+          {auth?.user?.avatar ? (
+            <img 
+              src={auth.user.avatar} 
+              alt={auth.user.name} 
+              className="h-8 w-8 rounded-full object-cover border-2 border-red-500"
+            />
+          ) : (
+            <div className={`h-8 w-8 rounded-full flex items-center justify-center text-white ${getAvatarBgColor()}`}>
+              {getUserInitials()}
+            </div>
+          )}
+          <span className="hidden sm:inline">{auth?.user?.name?.split(' ')[0]}</span>
+        </button>
+      </div>
+
+      {/* User Dialog */}
+      {showUserDialog && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setShowUserDialog(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Red banner strip */}
+            <div className="h-2 w-full bg-gradient-to-r from-red-700 to-red-500"></div>
+            
+            {/* User Info */}
+            <div className="p-6">
+              <div className="flex items-center space-x-4 mb-6">
+                {auth?.user?.avatar ? (
+                  <img 
+                    src={auth.user.avatar} 
+                    alt={auth.user.name} 
+                    className="h-16 w-16 rounded-full object-cover border-2 border-red-500"
+                  />
+                ) : (
+                  <div className={`h-16 w-16 rounded-full flex items-center justify-center text-white text-xl font-bold ${getAvatarBgColor()}`}>
+                    {getUserInitials()}
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">{auth?.user?.name}</h3>
+                  <p className="text-gray-600">{auth?.user?.email}</p>
+                  {auth?.user?.username && (
+                    <p className="text-sm text-red-600">NIM: {auth.user.username}</p>
+                  )}
+                </div>
+              </div>
+              
+              {/* Logout Button */}
+              <Link 
+                href={route('logout')} 
+                method="post" 
+                as="button" 
+                className="w-full flex items-center justify-center gap-2 mt-4 px-4 py-3 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 transition-all duration-300 border border-red-200"
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="font-medium">Logout</span>
+              </Link>
+            </div>
+            
+            {/* Close button */}
+            <button 
+              onClick={() => setShowUserDialog(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/90 hover:bg-red-50 text-red-700 transition-colors duration-200 shadow-md"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       <main className="flex-1">
         {/* Hero Section with Indonesian Heroes */}
@@ -488,7 +602,7 @@ export default function LandingPage({ kandidat }: Props) {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <p className="text-white text-sm font-bold">Calon Presiden BEM</p>
+                      <p className="text-white text-sm font-bold">Calon Presiden Mahasiswa</p>
                     </div>
                     <div className="absolute top-4 right-4 w-12 h-12 bg-red-700 rounded-full flex items-center justify-center text-white font-bold text-xl">
                       {calon.nomor_urut}
@@ -675,63 +789,61 @@ export default function LandingPage({ kandidat }: Props) {
           onClick={closeDialog}
         >
           <div 
-            className={`bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden transition-all duration-500 ease-out ${
+            className={`bg-white rounded-2xl shadow-2xl w-full h-full md:h-auto md:max-w-5xl md:max-h-[90vh] overflow-hidden transition-all duration-500 ease-out ${
               isClosing ? 'opacity-0 scale-90 translate-y-10' : 'opacity-100 scale-100 translate-y-0'
             }`}
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside dialog
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Red banner strip */}
             <div className="h-2 w-full bg-gradient-to-r from-red-700 to-red-500"></div>
             
-            <div className="flex flex-col md:flex-row">
-              {/* Left side - Photo and candidate info */}
-              <div className="w-full md:w-2/5 bg-gradient-to-br from-red-50 to-white p-6 relative">
+            <div className="flex flex-col h-[calc(100%-2rem)] overflow-y-auto">
+              {/* Candidate info section */}
+              <div className="bg-gradient-to-br from-red-50 to-white p-4 md:p-6 relative">
                 {/* Candidate number */}
-                <div className="absolute top-4 right-4 bg-red-700 text-white w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl shadow-lg">
+                <div className="absolute top-4 right-4 bg-red-700 text-white w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center font-bold text-xl md:text-2xl shadow-lg">
                   {selectedKandidat.nomor_urut}
                 </div>
                 
-                <h3 className="text-2xl font-bold text-red-700 mb-6 pr-14">
+                <h3 className="text-xl md:text-2xl font-bold text-red-700 mb-4 pr-14">
                   {selectedKandidat.nama}
                 </h3>
                 
-                {/* Foto wakil presiden */}
-                <div className="mb-6">
-                  <div className="aspect-square rounded-xl overflow-hidden shadow-lg border-2 border-red-700/30 mb-4">
+                {/* Candidate photo - Presiden only */}
+                <div className="mb-4">
+                  <div className="aspect-square rounded-xl overflow-hidden shadow-lg border-2 border-red-700/30 mb-2 max-w-[240px] mx-auto">
                     <img 
-                      src={`/storage/${selectedKandidat.foto_wakil}`} 
-                      alt={`Wakil - ${selectedKandidat.nama_wakil}`} 
-                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                      src={`/storage/${selectedKandidat.foto_presiden}`}
+                      alt={`Presiden - ${selectedKandidat.nama_presiden}`}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="text-center">
-                    <h4 className="font-bold text-red-700">Calon Wakil Presiden BEM</h4>
+                    <h4 className="font-bold text-red-700">Calon Nomor {selectedKandidat.nomor_urut}</h4>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-6">
-                  {/* Informasi Presiden & Wakil */}
-                  <div className="bg-white rounded-xl shadow-md p-4 transform transition-all duration-500 hover:shadow-lg hover:-translate-y-1">
-                    <div className="mb-3 border-b border-red-100 pb-3">
-                      <h4 className="font-bold text-red-700 mb-1">Calon Presiden BEM</h4>
-                      <p className="font-medium">{selectedKandidat.nama_presiden}</p>
-                      <p className="text-xs text-muted-foreground">{selectedKandidat.nomor_bp_presiden}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-red-700 mb-1">Calon Wakil Presiden BEM</h4>
-                      <p className="font-medium">{selectedKandidat.nama_wakil}</p>
-                      <p className="text-xs text-muted-foreground">{selectedKandidat.nomor_bp_wakil}</p>
-                    </div>
+                {/* Candidate details */}
+                <div className="bg-white rounded-xl shadow-md p-4">
+                  <div className="mb-3 border-b border-red-100 pb-3">
+                    <h4 className="font-bold text-red-700 mb-1">Calon Presiden Mahasiswa</h4>
+                    <p className="font-medium">{selectedKandidat.nama_presiden}</p>
+                    <p className="text-xs text-muted-foreground">{selectedKandidat.nomor_bp_presiden}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-red-700 mb-1">Calon Wakil Presiden Mahasiswa</h4>
+                    <p className="font-medium">{selectedKandidat.nama_wakil}</p>
+                    <p className="text-xs text-muted-foreground">{selectedKandidat.nomor_bp_wakil}</p>
                   </div>
                 </div>
               </div>
               
-              {/* Right side - Visi Misi content */}
-              <div className="w-full md:w-3/5 p-6 overflow-y-auto max-h-[70vh] md:max-h-[80vh]">
+              {/* Visi Misi section */}
+              <div className="flex-1 p-4 md:p-6">
                 {/* Tabs */}
-                <div className="flex border-b border-gray-200 mb-6">
+                <div className="flex border-b border-gray-200 mb-4">
                   <button
-                    className={`px-4 py-2 font-semibold transition-colors relative ${
+                    className={`flex-1 px-4 py-2 font-semibold transition-colors relative ${
                       activeTab === 'visi' 
                         ? 'text-red-700 border-b-2 border-red-700' 
                         : 'text-gray-500 hover:text-red-700'
@@ -739,12 +851,9 @@ export default function LandingPage({ kandidat }: Props) {
                     onClick={() => setActiveTab('visi')}
                   >
                     Visi
-                    {activeTab === 'visi' && (
-                      <span className="absolute bottom-0 left-0 h-[2px] w-full bg-red-700"></span>
-                    )}
                   </button>
                   <button
-                    className={`px-4 py-2 font-semibold transition-colors relative ${
+                    className={`flex-1 px-4 py-2 font-semibold transition-colors relative ${
                       activeTab === 'misi' 
                         ? 'text-red-700 border-b-2 border-red-700' 
                         : 'text-gray-500 hover:text-red-700'
@@ -752,13 +861,10 @@ export default function LandingPage({ kandidat }: Props) {
                     onClick={() => setActiveTab('misi')}
                   >
                     Misi
-                    {activeTab === 'misi' && (
-                      <span className="absolute bottom-0 left-0 h-[2px] w-full bg-red-700"></span>
-                    )}
                   </button>
                 </div>
                 
-                {/* Tab content with animation */}
+                {/* Tab content */}
                 <div className="relative">
                   <div
                     className={`transition-all duration-300 ease-in-out ${
@@ -767,14 +873,14 @@ export default function LandingPage({ kandidat }: Props) {
                         : 'opacity-0 translate-x-10 absolute inset-0 pointer-events-none'
                     }`}
                   >
-                    <h3 className="text-xl font-bold text-red-700 mb-4 flex items-center">
-                      <span className="bg-red-700 w-8 h-8 rounded-full text-white flex items-center justify-center mr-2 text-sm">
+                    <h3 className="text-lg font-bold text-red-700 mb-3 flex items-center">
+                      <span className="bg-red-700 w-7 h-7 rounded-full text-white flex items-center justify-center mr-2">
                         <Vote className="h-4 w-4" />
                       </span>
                       Visi
                     </h3>
-                    <div className="bg-white rounded-xl p-5 border border-red-100 shadow-sm">
-                      <p className="text-gray-700 leading-relaxed">
+                    <div className="bg-white rounded-xl p-4 border border-red-100">
+                      <p className="text-gray-700 text-sm leading-relaxed">
                         {selectedKandidat.visi}
                       </p>
                     </div>
@@ -787,37 +893,26 @@ export default function LandingPage({ kandidat }: Props) {
                         : 'opacity-0 -translate-x-10 absolute inset-0 pointer-events-none'
                     }`}
                   >
-                    <h3 className="text-xl font-bold text-red-700 mb-4 flex items-center">
-                      <span className="bg-red-700 w-8 h-8 rounded-full text-white flex items-center justify-center mr-2 text-sm">
+                    <h3 className="text-lg font-bold text-red-700 mb-3 flex items-center">
+                      <span className="bg-red-700 w-7 h-7 rounded-full text-white flex items-center justify-center mr-2">
                         <CheckCircle className="h-4 w-4" />
                       </span>
                       Misi
                     </h3>
-                    <div className="bg-white rounded-xl p-5 border border-red-100 shadow-sm">
-                      <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    <div className="bg-white rounded-xl p-4 border border-red-100">
+                      <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
                         {selectedKandidat.misi}
                       </div>
                     </div>
                   </div>
                 </div>
-                
-                {/* Close button */}
-                <div className="mt-8 flex justify-end">
-                  <Button
-                    className="bg-red-700 hover:bg-red-800 text-white shadow-md transition-all duration-200 font-semibold flex items-center"
-                    onClick={closeDialog}
-                  >
-                    <X className="mr-2 h-4 w-4" /> 
-                    Tutup
-                  </Button>
-                </div>
-          </div>
+              </div>
             </div>
             
             {/* Close button - top right */}
             <button 
               onClick={closeDialog}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/90 hover:bg-red-50 text-red-700 transition-colors duration-200 shadow-md"
+              className="fixed top-4 right-4 p-2 rounded-full bg-white/90 hover:bg-red-50 text-red-700 transition-colors duration-200 shadow-md"
             >
               <X className="h-5 w-5" />
             </button>
