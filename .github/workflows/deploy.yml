@@ -35,6 +35,19 @@ jobs:
       #     sed -i "s/APP_ENV=local/APP_ENV=production/" .env
       #     sed -i "s/APP_DEBUG=true/APP_DEBUG=false/" .env
 
+      - name: Prepare Storage Directories
+        run: |
+          mkdir -p storage/framework/cache
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+          mkdir -p storage/logs
+          chmod -R 775 storage
+          chmod -R 775 bootstrap/cache
+          touch storage/logs/.gitkeep
+          touch storage/framework/cache/.gitkeep
+          touch storage/framework/sessions/.gitkeep
+          touch storage/framework/views/.gitkeep
+
       - name: Cache Config
         run: |
           php artisan config:cache
@@ -58,8 +71,5 @@ jobs:
             phpunit.xml
             package-lock.json
             tests/**
-            storage/framework/cache/**
-            storage/framework/sessions/**
-            storage/framework/views/**
-            storage/logs/**
           log-level: verbose
+          dangerous-clean-slate: true
