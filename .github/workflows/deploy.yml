@@ -35,6 +35,15 @@ jobs:
       #     sed -i "s/APP_ENV=local/APP_ENV=production/" .env
       #     sed -i "s/APP_DEBUG=true/APP_DEBUG=false/" .env
 
+      - name: Prepare Storage Directories
+        run: |
+          mkdir -p storage/framework/cache
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+          mkdir -p storage/logs
+          chmod -R 775 storage
+          chmod -R 775 bootstrap/cache
+
       - name: Cache Config
         run: |
           php artisan config:cache
@@ -58,8 +67,19 @@ jobs:
             phpunit.xml
             package-lock.json
             tests/**
-            storage/framework/cache/**
-            storage/framework/sessions/**
-            storage/framework/views/**
-            storage/logs/**
           log-level: verbose
+
+      - name: Post-Deploy Permissions Fix
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: |
+            cd ${{ secrets.FTP_ROOT_DIR }}
+            mkdir -p storage/framework/cache
+            mkdir -p storage/framework/sessions
+            mkdir -p storage/framework/views
+            mkdir -p storage/logs
+            chmod -R 775 storage
+            chmod -R 775 bootstrap/cache
