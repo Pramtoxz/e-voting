@@ -43,6 +43,10 @@ jobs:
           mkdir -p storage/logs
           chmod -R 775 storage
           chmod -R 775 bootstrap/cache
+          touch storage/logs/.gitkeep
+          touch storage/framework/cache/.gitkeep
+          touch storage/framework/sessions/.gitkeep
+          touch storage/framework/views/.gitkeep
 
       - name: Cache Config
         run: |
@@ -68,18 +72,4 @@ jobs:
             package-lock.json
             tests/**
           log-level: verbose
-
-      - name: Post-Deploy Permissions Fix
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          script: |
-            cd ${{ secrets.FTP_ROOT_DIR }}
-            mkdir -p storage/framework/cache
-            mkdir -p storage/framework/sessions
-            mkdir -p storage/framework/views
-            mkdir -p storage/logs
-            chmod -R 775 storage
-            chmod -R 775 bootstrap/cache
+          dangerous-clean-slate: true
