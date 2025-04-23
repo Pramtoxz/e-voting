@@ -46,4 +46,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
         ];
     }
+    
+    /**
+     * Get the kuesioner associated with the user.
+     */
+    public function kuesioner()
+    {
+        return $this->hasOne(Kuesioner::class, 'username', 'username');
+    }
 }

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\KandidatController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\KuesionerController;
 
 // Redirect root ke login
 Route::get('/', function () {
@@ -32,6 +33,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route untuk menampilkan data mahasiswa yang telah voting
     Route::get('/voted-students', [VotingController::class, 'getVotedStudents'])->name('voting.students');
+
+    // Route untuk kuesioner
+    Route::get('kuesioner', [KuesionerController::class, 'index'])->name('kuesioner.index');
+    Route::post('kuesioner', [KuesionerController::class, 'store'])->name('kuesioner.store');
 
     // Route untuk admin
     Route::middleware(['admin'])->group(function () {
