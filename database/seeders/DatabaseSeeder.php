@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,20 +14,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Pengaturan dasar aplikasi
-        \App\Models\Setting::create([
-            'key' => 'show_voting_results',
-            'value' => '0',
-        ]);
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'show_voting_results'],
+            ['value' => '0']
+        );
 
-        \App\Models\Setting::create([
-            'key' => 'countdown_active',
-            'value' => '1',
-        ]);
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'countdown_active'],
+            ['value' => '1']
+        );
 
-        \App\Models\Setting::create([
-            'key' => 'countdown_end_time',
-            'value' => now()->addMinutes(10)->format('Y-m-d H:i:s'),
-        ]);
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'countdown_end_time'],
+            ['value' => now()->addMinutes(10)->format('Y-m-d H:i:s')]
+        );
 
         // Cek apakah admin sudah ada
         if (!User::where('email', 'admin@jayanusa.ac.id')->exists()) {
