@@ -1,17 +1,16 @@
-import React from "react"
+import React from 'react';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
-  className?: string
+    children: React.ReactNode;
+    className?: string;
 }
 
-const Card: React.FC<CardProps> = ({ children, className = "", ...props }) => {
-  return (
-    <div className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className}`} {...props}>
-      {children}
-    </div>
-  )
-}
+const Card: React.FC<CardProps> = ({ children, className = '', ...props }) => {
+    return (
+        <div className={`bg-card text-card-foreground rounded-lg border shadow-sm ${className}`} {...props}>
+            {children}
+        </div>
+    );
+};
 
-export default Card
-  
+export default Card;

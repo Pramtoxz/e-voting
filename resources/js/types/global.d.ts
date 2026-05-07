@@ -8,7 +8,7 @@ declare global {
             playVideo(): void;
         }
     }
-    
+
     interface Window {
         YT: {
             Player: new (
@@ -22,7 +22,7 @@ declare global {
                         onReady?: () => void;
                         onStateChange?: (event: { data: number }) => void;
                     };
-                }
+                },
             ) => YT.Player;
         };
         onYouTubeIframeAPIReady: () => void;
