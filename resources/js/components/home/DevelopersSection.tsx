@@ -1,4 +1,6 @@
 import { Code2, Github, Instagram, Linkedin, Mail } from 'lucide-react';
+import DitoImage from '@/assets/dito.jpg';
+import RafiImage from '@/assets/rafi.jpg';
 
 interface Developer {
     name: string;
@@ -17,7 +19,7 @@ const developers: Developer[] = [
     {
         name: 'Rafi Chandra',
         role: 'Full Stack Developer',
-        image: 'https://ui-avatars.com/api/?name=Rafi+Chandra&size=400&background=dc2626&color=fff&bold=true',
+        image: RafiImage,
         bio: 'Passionate about creating elegant solutions to complex problems',
         social: {
             github: 'https://github.com/chandra_rafi',
@@ -28,7 +30,7 @@ const developers: Developer[] = [
     {
         name: 'Pramudito Metra',
         role: 'Full Stack Developer',
-        image: 'https://ui-avatars.com/api/?name=Pramudito+Metra&size=400&background=dc2626&color=fff&bold=true',
+        image: DitoImage,
         bio: 'Building innovative web applications with modern technologies',
         social: {
             github: 'https://github.com/pramuditometra',
