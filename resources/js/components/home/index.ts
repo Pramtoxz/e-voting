@@ -1,4 +1,7 @@
 export { default as AboutSection } from './AboutSection';
+export { default as DevelopersSection } from './DevelopersSection';
+export { default as FAQSection } from './FAQSection';
+export { default as Footer } from './Footer';
 export { default as HeroSection } from './HeroSection';
 export { default as KandidatCard } from './KandidatCard';
 export { default as KandidatSection } from './KandidatSection';

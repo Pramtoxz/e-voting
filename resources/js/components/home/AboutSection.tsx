@@ -21,7 +21,7 @@ export default function AboutSection({ garudaUrl }: AboutSectionProps) {
                 ></div>
             </div>
 
-            <div className="relative container px-4 md:px-6">
+            <div className="relative container mx-auto px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center">
                     <div className="space-y-2">
                         <div className="inline-flex items-center rounded-full border border-red-600 px-2.5 py-0.5 text-sm font-semibold text-red-600 transition-colors focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:outline-none">
@@ -29,13 +29,13 @@ export default function AboutSection({ garudaUrl }: AboutSectionProps) {
                             Tentang PEMIRA
                         </div>
                         <h2 className="text-3xl font-bold tracking-tighter text-red-600 sm:text-5xl">Apa itu PEMIRA?</h2>
-                        <p className="text-muted-foreground max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                        <p className="text-muted-foreground max-w-[900px] text-sm md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                             Pemilihan Raya Mahasiswa (PEMIRA) adalah proses pemilihan pemimpin organisasi kemahasiswaan di tingkat universitas.
                             Melalui PEMIRA, mahasiswa dapat memilih calon pemimpin yang akan mewakili aspirasi dan kepentingan mereka.
                         </p>
                     </div>
                 </div>
-                <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3">
+                <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
                     <Card className="border-red-100 shadow-sm">
                         <div className="p-6 pt-6">
                             <div className="flex flex-col items-center space-y-2 text-center">
@@ -43,7 +43,7 @@ export default function AboutSection({ garudaUrl }: AboutSectionProps) {
                                     <Vote className="h-6 w-6 text-red-600" />
                                 </div>
                                 <h3 className="text-xl font-bold text-red-600">Demokrasi Kampus</h3>
-                                <p className="text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     PEMIRA merupakan wujud demokrasi di lingkungan kampus yang memberikan hak suara kepada seluruh mahasiswa.
                                 </p>
                             </div>
@@ -56,7 +56,7 @@ export default function AboutSection({ garudaUrl }: AboutSectionProps) {
                                     <Users className="h-6 w-6 text-red-600" />
                                 </div>
                                 <h3 className="text-xl font-bold text-red-600">Representasi Mahasiswa</h3>
-                                <p className="text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     Memilih pemimpin yang akan mewakili aspirasi dan kepentingan seluruh mahasiswa di tingkat universitas.
                                 </p>
                             </div>
@@ -69,7 +69,7 @@ export default function AboutSection({ garudaUrl }: AboutSectionProps) {
                                     <FileText className="h-6 w-6 text-red-600" />
                                 </div>
                                 <h3 className="text-xl font-bold text-red-600">Transparansi</h3>
-                                <p className="text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     Proses pemilihan yang transparan dan akuntabel untuk memastikan hasil yang adil dan dapat dipercaya.
                                 </p>
                             </div>

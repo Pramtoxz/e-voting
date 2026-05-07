@@ -38,10 +38,6 @@ export default function WelcomeDialog({ show, onStart }: WelcomeDialogProps) {
                             <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-red-600" />
                             <p className="text-sm text-gray-700">Bagikan saran dan kesan Anda</p>
                         </div>
-                        <div className="flex items-start gap-3">
-                            <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-red-600" />
-                            <p className="text-sm text-gray-700">Nikmati musik latar saat mengisi kuesioner</p>
-                        </div>
                     </div>
 
                     <button

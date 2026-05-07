@@ -14,28 +14,4 @@ export const HOME_STYLES = `
 .garuda-float {
   animation: floating 3s ease-in-out infinite;
 }
-
-@keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
-
-.animate-marquee {
-  animation: marquee 20s linear infinite;
-}
-
-.animate-marquee2 {
-  animation: marquee 100s linear infinite;
-  animation-delay: 20s;
-}
-
-.marquee-item {
-  transition: all 0.3s ease;
-}
-
-.marquee-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  z-index: 10;
-}
 `;

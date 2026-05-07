@@ -23,7 +23,7 @@ export default function Navbar({ user }: NavbarProps) {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 20);
 
-            const sections = ['beranda', 'tentang', 'kandidat'];
+            const sections = ['beranda', 'tentang', 'kandidat', 'faq', 'developers'];
             const scrollPosition = window.scrollY + 100;
 
             for (const section of sections) {
@@ -52,6 +52,8 @@ export default function Navbar({ user }: NavbarProps) {
         { href: '#beranda', label: 'Beranda', id: 'beranda' },
         { href: '#tentang', label: 'Tentang', id: 'tentang' },
         { href: '#kandidat', label: 'Kandidat', id: 'kandidat' },
+        { href: '#faq', label: 'FAQ', id: 'faq' },
+        { href: '#developers', label: 'Developers', id: 'developers' },
     ];
 
     const getInitials = () => getUserInitials(user);

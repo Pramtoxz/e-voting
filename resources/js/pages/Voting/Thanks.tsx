@@ -136,4 +136,4 @@ export default function Thanks({ vote }: ThanksProps) {
     );
 }
 
-Thanks.layout = (page: React.ReactNode) => <Layout children={page} title="Terima Kasih - PEMIRA" />;
+Thanks.layout = (page: React.ReactNode) => <Layout children={page} title="Terima Kasih - PEMIRA" showFooter={false} />;

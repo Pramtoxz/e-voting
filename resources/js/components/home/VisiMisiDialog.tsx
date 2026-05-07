@@ -76,11 +76,35 @@ export default function VisiMisiDialog({ show, kandidat, isClosing, onClose }: V
                     <div className="max-h-96 overflow-y-auto">
                         {activeTab === 'visi' ? (
                             <div className="prose max-w-none">
-                                <p className="whitespace-pre-wrap text-gray-700">{kandidat.visi}</p>
+                                {Array.isArray(kandidat.visi) ? (
+                                    <ul className="space-y-3">
+                                        {kandidat.visi.map((item, index) => (
+                                            item.trim() && (
+                                                <li key={index} className="text-gray-700 leading-relaxed">
+                                                    {item}
+                                                </li>
+                                            )
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">{kandidat.visi}</p>
+                                )}
                             </div>
                         ) : (
                             <div className="prose max-w-none">
-                                <p className="whitespace-pre-wrap text-gray-700">{kandidat.misi}</p>
+                                {Array.isArray(kandidat.misi) ? (
+                                    <ol className="space-y-3 list-decimal list-inside">
+                                        {kandidat.misi.map((item, index) => (
+                                            item.trim() && (
+                                                <li key={index} className="text-gray-700 leading-relaxed">
+                                                    {item}
+                                                </li>
+                                            )
+                                        ))}
+                                    </ol>
+                                ) : (
+                                    <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">{kandidat.misi}</p>
+                                )}
                             </div>
                         )}
                     </div>

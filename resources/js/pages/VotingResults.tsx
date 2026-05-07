@@ -26,9 +26,17 @@ interface VotingResultsProps {
     showResults: boolean;
     showCountdown: boolean;
     countdownEndTime: string | null;
+    auth?: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            username: string;
+        };
+    };
 }
 
-export default function VotingResults({ kandidat, totalVotes, totalVoters, showResults, showCountdown, countdownEndTime }: VotingResultsProps) {
+export default function VotingResults({ kandidat, totalVotes, totalVoters, showResults, showCountdown, countdownEndTime, auth }: VotingResultsProps) {
     const pemiraYear = getPemiraYear();
     
     // State untuk countdown
@@ -206,7 +214,7 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
     // Tampilkan countdown jika showCountdown true dan countdown belum selesai
     if (showCountdown && !countdownFinished) {
         return (
-            <Layout title={`Pengumuman Hasil Voting - PEMIRA ${pemiraYear}`}>
+            <Layout title={`Pengumuman Hasil Voting - PEMIRA ${pemiraYear}`} auth={auth}>
                 <Head title={`Pengumuman Hasil Voting - PEMIRA ${pemiraYear}`} />
 
                 {/* CSS untuk animasi */}
@@ -295,7 +303,7 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
     // Tampilkan pesan jika tidak boleh menampilkan hasil
     if (!showResults) {
         return (
-            <Layout title={`Hasil Voting - PEMIRA ${pemiraYear}`}>
+            <Layout title={`Hasil Voting - PEMIRA ${pemiraYear}`} auth={auth}>
                 <Head title={`Hasil Voting - PEMIRA ${pemiraYear}`} />
                 <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
 
@@ -365,7 +373,7 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
 
     // Tampilan modern hasil voting
     return (
-        <Layout title={`Hasil Voting - PEMIRA ${pemiraYear}`}>
+        <Layout title={`Hasil Voting - PEMIRA ${pemiraYear}`} auth={auth}>
             <Head title={`Hasil Voting - PEMIRA ${pemiraYear}`} />
             <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
 

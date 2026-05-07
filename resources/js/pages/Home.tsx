@@ -1,5 +1,8 @@
 import {
     AboutSection,
+    DevelopersSection,
+    FAQSection,
+    Footer,
     HeroSection,
     KandidatSection,
     Navbar,
@@ -52,21 +55,29 @@ export default function LandingPage({ kandidat, auth }: Props) {
 
             <style dangerouslySetInnerHTML={{ __html: HOME_STYLES }} />
 
-            <Navbar user={auth?.user} />
+            <div className="min-h-screen w-full">
+                <Navbar user={auth?.user} />
 
-            <main className="flex-1">
-                <HeroSection typingText={typingText} batikPatternUrl={BATIK_PATTERN_URL} isAuthenticated={!!auth?.user} />
+                <main className="w-full">
+                    <HeroSection typingText={typingText} batikPatternUrl={BATIK_PATTERN_URL} isAuthenticated={!!auth?.user} />
 
-                <VotedStudentsMarquee students={votedStudents} loading={loading} getInitialAvatar={getStudentAvatar} />
+                    <VotedStudentsMarquee students={votedStudents} loading={loading} getInitialAvatar={getStudentAvatar} />
 
-                <PancasilaPrinciples />
+                    <PancasilaPrinciples />
 
-                <AboutSection garudaUrl={GARUDA_URL} />
+                    <AboutSection garudaUrl={GARUDA_URL} />
 
-                <KandidatSection kandidat={kandidat} onOpenDialog={openDialog} />
+                    <KandidatSection kandidat={kandidat} onOpenDialog={openDialog} />
 
-                <VisiMisiDialog show={showDialog} kandidat={selectedKandidat} isClosing={isClosing} onClose={closeDialog} />
-            </main>
+                    <FAQSection />
+
+                    <DevelopersSection />
+
+                    <VisiMisiDialog show={showDialog} kandidat={selectedKandidat} isClosing={isClosing} onClose={closeDialog} />
+                </main>
+
+                <Footer />
+            </div>
         </>
     );
 }
