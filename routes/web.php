@@ -13,14 +13,16 @@ use App\Http\Controllers\KuesionerController;
 use App\Http\Controllers\VotingResultsController;
 use App\Http\Controllers\Admin\SettingController;
 
-// Redirect root ke login
+// Redirect root ke home
 Route::get('/', function () {
-    return Redirect::route('login');
+    return Redirect::route('home');
 });
 
-// Public Routes
+// Public Routes - dapat diakses tanpa login
+Route::get('home', [HomeController::class, 'index'])->name('home');
 Route::get('/voting-results', [VotingResultsController::class, 'index'])->name('voting.results');
 Route::get('/api/check-countdown', [VotingResultsController::class, 'checkCountdown'])->name('api.check-countdown');
+Route::get('/voted-students', [VotingController::class, 'getVotedStudents'])->name('voting.students');
 
 // Route untuk pengguna yang sudah login
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -29,21 +31,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('admin')
         ->name('dashboard');
 
-    // Route untuk semua user
-    Route::get('home', [HomeController::class, 'index'])->name('home');
-
-    // Route untuk voting
+    // Route untuk voting - WAJIB LOGIN
     Route::get('voting', [VotingController::class, 'index'])->name('voting.index');
     Route::post('voting', [VotingController::class, 'store'])->name('voting.store');
     Route::get('voting/thanks', [VotingController::class, 'thanks'])->name('voting.thanks');
 
-    // Route untuk hasil voting (dapat diakses oleh semua pengguna)
-    Route::get('voting/results', [VotingResultsController::class, 'index'])->name('voting.results');
-
-    // Route untuk menampilkan data mahasiswa yang telah voting
-    Route::get('/voted-students', [VotingController::class, 'getVotedStudents'])->name('voting.students');
-
-    // Route untuk kuesioner
+    // Route untuk kuesioner - WAJIB LOGIN
     Route::get('kuesioner', [KuesionerController::class, 'index'])->name('kuesioner.index');
     Route::post('kuesioner', [KuesionerController::class, 'store'])->name('kuesioner.store');
 

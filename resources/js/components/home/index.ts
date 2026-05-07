@@ -1,0 +1,9 @@
+export { default as AboutSection } from './AboutSection';
+export { default as HeroSection } from './HeroSection';
+export { default as KandidatCard } from './KandidatCard';
+export { default as KandidatSection } from './KandidatSection';
+export { default as Navbar } from './Navbar';
+export { default as PancasilaPrinciples } from './PancasilaPrinciples';
+export { default as UserDialog } from './UserDialog';
+export { default as VisiMisiDialog } from './VisiMisiDialog';
+export { default as VotedStudentsMarquee } from './VotedStudentsMarquee';

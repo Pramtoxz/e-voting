@@ -418,7 +418,7 @@
 <body>
     <!-- Overlay untuk memaksa interaksi -->
     <div id="interactionOverlay">
-        <h2>Pemira Jayanusa 2025</h2>
+        <h2>Pemira Jayanusa {{ date('Y') }}</h2>
         <p>Mari bersama wujudkan demokrasi yang jujur dan transparan untuk masa depan yang lebih baik</p>
         <button id="interactionButton">Masuk ke Portal</button>
     </div>
@@ -428,7 +428,7 @@
 
         <div class="header">
             <div class="title">Pemilihan Segera Dimulai!</div>
-            <div class="subtitle">PEMIRA 2025 akan dibuka sebentar lagi</div>
+            <div class="subtitle">PEMIRA {{ date('Y') }} akan dibuka sebentar lagi</div>
             
             <!-- Audio controls -->
             <div class="audio-control">

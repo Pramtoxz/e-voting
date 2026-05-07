@@ -1,19 +1,14 @@
-import AppLayout from '@/layouts/app-layout';
-import { Head, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/components/ui/use-toast';
+import AppLayout from '@/layouts/app-layout';
+import { Head, useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
+import { getPemiraPeriode } from '@/utils/date';
 
 type FormData = {
     nomor_urut: string;
@@ -31,7 +26,7 @@ type FormData = {
     visi: string;
     misi: string;
     periode: string;
-}
+};
 
 export default function Create() {
     const { toast } = useToast();
@@ -50,14 +45,16 @@ export default function Create() {
         foto_wakil_preview: null,
         visi: '',
         misi: '',
-        periode: '',
+        periode: getPemiraPeriode(),
     });
 
     // Effect untuk set nama berdasarkan nama presiden dan wakil
     useEffect(() => {
         if (form.data.nama_presiden && form.data.nama_wakil) {
             const pasangan = `${form.data.nama_presiden} & ${form.data.nama_wakil}`;
-            form.setData('nama', pasangan);
+            if (form.data.nama !== pasangan) {
+                form.setData('nama', pasangan);
+            }
         }
     }, [form.data.nama_presiden, form.data.nama_wakil]);
 
@@ -67,17 +64,17 @@ export default function Create() {
             forceFormData: true, // Paksa gunakan FormData untuk upload file
             onSuccess: () => {
                 toast({
-                    title: "Berhasil!",
-                    description: "Kandidat berhasil ditambahkan",
-                    variant: "success",
+                    title: 'Berhasil!',
+                    description: 'Kandidat berhasil ditambahkan',
+                    variant: 'success',
                 });
             },
             onError: (errors) => {
                 console.error(errors);
                 toast({
-                    title: "Error!",
-                    description: "Gagal menambahkan kandidat. Periksa form Anda.",
-                    variant: "destructive",
+                    title: 'Error!',
+                    description: 'Gagal menambahkan kandidat. Periksa form Anda.',
+                    variant: 'destructive',
                 });
             },
         });
@@ -96,140 +93,154 @@ export default function Create() {
             <Head title="Tambah Kandidat" />
             <div className="p-3 sm:p-6">
                 {/* Header */}
-                <div className="bg-white rounded-lg shadow-sm mb-6">
+                <div className="mb-6 rounded-lg bg-white shadow-sm">
                     <div className="p-4 sm:p-6">
                         <div className="flex flex-col items-center gap-4">
-                            <h2 className="text-xl sm:text-2xl font-bold text-center">
-                                Formulir Pendaftaran Kandidat
-                            </h2>
-                            <p className="text-sm text-muted-foreground text-center">
-                                Silakan lengkapi data kandidat dengan benar
-                            </p>
+                            <h2 className="text-center text-xl font-bold sm:text-2xl">Formulir Pendaftaran Kandidat</h2>
+                            <p className="text-muted-foreground text-center text-sm">Silakan lengkapi data kandidat dengan benar</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Form */}
-                <div className="bg-white rounded-lg shadow-sm">
+                <div className="rounded-lg bg-white shadow-sm">
                     <div className="p-4 sm:p-6">
                         <form onSubmit={onSubmit} className="space-y-8">
                             {/* Data Kandidat */}
                             <div className="space-y-6">
-                                <div className="pb-4 border-b">
-                                    <h3 className="text-lg font-semibold text-primary">Data Kandidat</h3>
-                                    <p className="text-sm text-muted-foreground">Informasi umum kandidat</p>
+                                <div className="border-b pb-4">
+                                    <h3 className="text-primary text-lg font-semibold">Data Kandidat</h3>
+                                    <p className="text-muted-foreground text-sm">Informasi umum kandidat</p>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="nomor_urut">Nomor Urut <span className="text-destructive">*</span></Label>
+                                        <Label htmlFor="nomor_urut">
+                                            Nomor Urut <span className="text-destructive">*</span>
+                                        </Label>
                                         <Input
                                             id="nomor_urut"
+                                            type="number"
+                                            min="1"
+                                            max="9"
                                             value={form.data.nomor_urut}
-                                            onChange={e => form.setData('nomor_urut', e.target.value)}
-                                            placeholder="Masukkan nomor urut"
-                                            className={form.errors.nomor_urut ? "border-destructive" : ""}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                // Hanya izinkan angka 1-9 (1 digit)
+                                                if (value === '' || (parseInt(value) >= 1 && parseInt(value) <= 9 && value.length === 1)) {
+                                                    form.setData('nomor_urut', value);
+                                                }
+                                            }}
+                                            placeholder="1-9"
+                                            className={form.errors.nomor_urut ? 'border-destructive' : ''}
                                         />
-                                        {form.errors.nomor_urut && (
-                                            <p className="text-xs text-destructive mt-1">{form.errors.nomor_urut}</p>
-                                        )}
+                                        {form.errors.nomor_urut && <p className="text-destructive mt-1 text-xs">{form.errors.nomor_urut}</p>}
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="periode">Periode <span className="text-destructive">*</span></Label>
+                                        <Label htmlFor="periode">
+                                            Periode <span className="text-destructive">*</span>
+                                        </Label>
                                         <Input
                                             id="periode"
                                             value={form.data.periode}
-                                            onChange={e => form.setData('periode', e.target.value)}
-                                            placeholder="Contoh: 2025/2026"
-                                            className={form.errors.periode ? "border-destructive" : ""}
+                                            onChange={(e) => form.setData('periode', e.target.value)}
+                                            placeholder={getPemiraPeriode()}
+                                            className={form.errors.periode ? 'border-destructive' : ''}
                                         />
-                                        {form.errors.periode && (
-                                            <p className="text-xs text-destructive mt-1">{form.errors.periode}</p>
-                                        )}
+                                        {form.errors.periode && <p className="text-destructive mt-1 text-xs">{form.errors.periode}</p>}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Data Presiden */}
                             <div className="space-y-6">
-                                <div className="pb-4 border-b">
-                                    <h3 className="text-lg font-semibold text-primary">Data Calon Presiden</h3>
-                                    <p className="text-sm text-muted-foreground">Informasi calon presiden BEM</p>
+                                <div className="border-b pb-4">
+                                    <h3 className="text-primary text-lg font-semibold">Data Calon Presiden</h3>
+                                    <p className="text-muted-foreground text-sm">Informasi calon presiden BEM</p>
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row gap-6">
-                                    <div className="space-y-6 flex-1">
+                                <div className="flex flex-col gap-6 sm:flex-row">
+                                    <div className="flex-1 space-y-6">
                                         <div className="space-y-2">
-                                            <Label htmlFor="nama_presiden">Nama Presiden <span className="text-destructive">*</span></Label>
+                                            <Label htmlFor="nama_presiden">
+                                                Nama Presiden <span className="text-destructive">*</span>
+                                            </Label>
                                             <Input
                                                 id="nama_presiden"
                                                 value={form.data.nama_presiden}
-                                                onChange={e => form.setData('nama_presiden', e.target.value)}
+                                                onChange={(e) => form.setData('nama_presiden', e.target.value)}
                                                 placeholder="Masukkan nama presiden"
-                                                className={form.errors.nama_presiden ? "border-destructive" : ""}
+                                                className={form.errors.nama_presiden ? 'border-destructive' : ''}
                                             />
                                             {form.errors.nama_presiden && (
-                                                <p className="text-xs text-destructive mt-1">{form.errors.nama_presiden}</p>
+                                                <p className="text-destructive mt-1 text-xs">{form.errors.nama_presiden}</p>
                                             )}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="nomor_bp_presiden">Nomor BP <span className="text-destructive">*</span></Label>
+                                            <Label htmlFor="nomor_bp_presiden">
+                                                Nomor BP <span className="text-destructive">*</span>
+                                            </Label>
                                             <Input
                                                 id="nomor_bp_presiden"
                                                 value={form.data.nomor_bp_presiden}
-                                                onChange={e => form.setData('nomor_bp_presiden', e.target.value)}
+                                                onChange={(e) => form.setData('nomor_bp_presiden', e.target.value)}
                                                 placeholder="Masukkan nomor BP"
-                                                className={form.errors.nomor_bp_presiden ? "border-destructive" : ""}
+                                                className={form.errors.nomor_bp_presiden ? 'border-destructive' : ''}
                                             />
                                             {form.errors.nomor_bp_presiden && (
-                                                <p className="text-xs text-destructive mt-1">{form.errors.nomor_bp_presiden}</p>
+                                                <p className="text-destructive mt-1 text-xs">{form.errors.nomor_bp_presiden}</p>
                                             )}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="prodi_presiden">Program Studi <span className="text-destructive">*</span></Label>
-                                            <Select
-                                                value={form.data.prodi_presiden}
-                                                onValueChange={value => form.setData('prodi_presiden', value)}
-                                            >
-                                                <SelectTrigger className={form.errors.prodi_presiden ? "border-destructive" : ""}>
+                                            <Label htmlFor="prodi_presiden">
+                                                Program Studi <span className="text-destructive">*</span>
+                                            </Label>
+                                            <Select value={form.data.prodi_presiden} onValueChange={(value) => form.setData('prodi_presiden', value)}>
+                                                <SelectTrigger className={form.errors.prodi_presiden ? 'border-destructive' : ''}>
                                                     <SelectValue placeholder="Pilih program studi" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="SI">
                                                         <div className="flex items-center">
-                                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">S1-Sistem Informasi</span>
+                                                            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+                                                                S1-Sistem Informasi
+                                                            </span>
                                                         </div>
                                                     </SelectItem>
                                                     <SelectItem value="MI">
                                                         <div className="flex items-center">
-                                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">D3-Manajemen Informatika</span>
+                                                            <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                                                                D3-Manajemen Informatika
+                                                            </span>
                                                         </div>
                                                     </SelectItem>
                                                     <SelectItem value="SK">
                                                         <div className="flex items-center">
-                                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">S1-Sistem Komputer</span>
+                                                            <span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800">
+                                                                S1-Sistem Komputer
+                                                            </span>
                                                         </div>
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                            {form.errors.prodi_presiden && (
-                                                <p className="text-xs text-destructive">{form.errors.prodi_presiden}</p>
-                                            )}
+                                            {form.errors.prodi_presiden && <p className="text-destructive text-xs">{form.errors.prodi_presiden}</p>}
                                         </div>
                                     </div>
 
-                                    <div className="w-full sm:w-1/3 space-y-2">
-                                        <Label htmlFor="foto_presiden" className="italic">Foto 3x4 <span className="text-destructive">*</span></Label>
-                                        <div className="relative flex flex-col items-center p-4 border-2 border-dashed rounded-lg">
+                                    <div className="w-full space-y-2 sm:w-1/3">
+                                        <Label htmlFor="foto_presiden" className="italic">
+                                            Foto 3x4 <span className="text-destructive">*</span>
+                                        </Label>
+                                        <div className="relative flex flex-col items-center rounded-lg border-2 border-dashed p-4">
                                             {form.data.foto_presiden_preview ? (
                                                 <div className="space-y-4">
-                                                    <img 
-                                                        src={form.data.foto_presiden_preview} 
-                                                        alt="Preview" 
-                                                        className="w-full h-[200px] object-cover rounded-lg shadow-sm"
+                                                    <img
+                                                        src={form.data.foto_presiden_preview}
+                                                        alt="Preview"
+                                                        className="h-[200px] w-full rounded-lg object-cover shadow-sm"
                                                     />
                                                     <Button
                                                         type="button"
@@ -237,20 +248,42 @@ export default function Create() {
                                                         className="w-full"
                                                         onClick={() => document.getElementById('foto_presiden')?.click()}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="mr-2 h-4 w-4"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                                                            />
                                                         </svg>
                                                         Ganti Foto
                                                     </Button>
                                                 </div>
                                             ) : (
                                                 <div className="space-y-4">
-                                                    <div className="flex flex-col items-center justify-center w-full h-[200px] bg-muted/30 rounded-lg">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 mb-2 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    <div className="bg-muted/30 flex h-[200px] w-full flex-col items-center justify-center rounded-lg">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="text-muted-foreground mb-2 h-8 w-8"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                            />
                                                         </svg>
-                                                        <p className="text-sm text-muted-foreground text-center">Belum ada foto</p>
-                                                        <p className="text-xs text-muted-foreground mt-1">Format: JPG, PNG (Max. 2MB)</p>
+                                                        <p className="text-muted-foreground text-center text-sm">Belum ada foto</p>
+                                                        <p className="text-muted-foreground mt-1 text-xs">Format: JPG, PNG (Max. 2MB)</p>
                                                     </div>
                                                     <Button
                                                         type="button"
@@ -258,8 +291,19 @@ export default function Create() {
                                                         className="w-full"
                                                         onClick={() => document.getElementById('foto_presiden')?.click()}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="mr-2 h-4 w-4"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                                                            />
                                                         </svg>
                                                         Upload Foto
                                                     </Button>
@@ -273,7 +317,7 @@ export default function Create() {
                                                 className="hidden"
                                             />
                                             {form.errors.foto_presiden && (
-                                                <p className="text-xs text-destructive mt-2">{form.errors.foto_presiden}</p>
+                                                <p className="text-destructive mt-2 text-xs">{form.errors.foto_presiden}</p>
                                             )}
                                         </div>
                                     </div>
@@ -282,83 +326,90 @@ export default function Create() {
 
                             {/* Data Wakil */}
                             <div className="space-y-6">
-                                <div className="pb-4 border-b">
-                                    <h3 className="text-lg font-semibold text-primary">Data Calon Wakil Presiden</h3>
-                                    <p className="text-sm text-muted-foreground">Informasi calon wakil presiden BEM</p>
+                                <div className="border-b pb-4">
+                                    <h3 className="text-primary text-lg font-semibold">Data Calon Wakil Presiden</h3>
+                                    <p className="text-muted-foreground text-sm">Informasi calon wakil presiden BEM</p>
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row gap-6">
-                                    <div className="space-y-6 flex-1">
+                                <div className="flex flex-col gap-6 sm:flex-row">
+                                    <div className="flex-1 space-y-6">
                                         <div className="space-y-2">
-                                            <Label htmlFor="nama_wakil">Nama Wakil <span className="text-destructive">*</span></Label>
+                                            <Label htmlFor="nama_wakil">
+                                                Nama Wakil <span className="text-destructive">*</span>
+                                            </Label>
                                             <Input
                                                 id="nama_wakil"
                                                 value={form.data.nama_wakil}
-                                                onChange={e => form.setData('nama_wakil', e.target.value)}
+                                                onChange={(e) => form.setData('nama_wakil', e.target.value)}
                                                 placeholder="Masukkan nama wakil"
-                                                className={form.errors.nama_wakil ? "border-destructive" : ""}
+                                                className={form.errors.nama_wakil ? 'border-destructive' : ''}
                                             />
-                                            {form.errors.nama_wakil && (
-                                                <p className="text-xs text-destructive mt-1">{form.errors.nama_wakil}</p>
-                                            )}
+                                            {form.errors.nama_wakil && <p className="text-destructive mt-1 text-xs">{form.errors.nama_wakil}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="nomor_bp_wakil">Nomor BP <span className="text-destructive">*</span></Label>
+                                            <Label htmlFor="nomor_bp_wakil">
+                                                Nomor BP <span className="text-destructive">*</span>
+                                            </Label>
                                             <Input
                                                 id="nomor_bp_wakil"
                                                 value={form.data.nomor_bp_wakil}
-                                                onChange={e => form.setData('nomor_bp_wakil', e.target.value)}
+                                                onChange={(e) => form.setData('nomor_bp_wakil', e.target.value)}
                                                 placeholder="Masukkan nomor BP"
-                                                className={form.errors.nomor_bp_wakil ? "border-destructive" : ""}
+                                                className={form.errors.nomor_bp_wakil ? 'border-destructive' : ''}
                                             />
                                             {form.errors.nomor_bp_wakil && (
-                                                <p className="text-xs text-destructive mt-1">{form.errors.nomor_bp_wakil}</p>
+                                                <p className="text-destructive mt-1 text-xs">{form.errors.nomor_bp_wakil}</p>
                                             )}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="prodi_wakil">Program Studi <span className="text-destructive">*</span></Label>
-                                            <Select
-                                                value={form.data.prodi_wakil}
-                                                onValueChange={value => form.setData('prodi_wakil', value)}
-                                            >
-                                                <SelectTrigger className={form.errors.prodi_wakil ? "border-destructive" : ""}>
+                                            <Label htmlFor="prodi_wakil">
+                                                Program Studi <span className="text-destructive">*</span>
+                                            </Label>
+                                            <Select value={form.data.prodi_wakil} onValueChange={(value) => form.setData('prodi_wakil', value)}>
+                                                <SelectTrigger className={form.errors.prodi_wakil ? 'border-destructive' : ''}>
                                                     <SelectValue placeholder="Pilih program studi" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="SI">
                                                         <div className="flex items-center">
-                                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">S1-Sistem Informasi</span>
+                                                            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+                                                                S1-Sistem Informasi
+                                                            </span>
                                                         </div>
                                                     </SelectItem>
                                                     <SelectItem value="MI">
                                                         <div className="flex items-center">
-                                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">D3-Manajemen Informatika</span>
+                                                            <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                                                                D3-Manajemen Informatika
+                                                            </span>
                                                         </div>
                                                     </SelectItem>
                                                     <SelectItem value="SK">
                                                         <div className="flex items-center">
-                                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">S1-Sistem Komputer</span>
+                                                            <span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800">
+                                                                S1-Sistem Komputer
+                                                            </span>
                                                         </div>
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                            {form.errors.prodi_wakil && (
-                                                <p className="text-xs text-destructive">{form.errors.prodi_wakil}</p>
-                                            )}
+                                            {form.errors.prodi_wakil && <p className="text-destructive text-xs">{form.errors.prodi_wakil}</p>}
                                         </div>
                                     </div>
 
-                                    <div className="w-full sm:w-1/3 space-y-2">
-                                        <Label htmlFor="foto_wakil" className="italic">Foto 3x4 <span className="text-destructive">*</span></Label>
-                                        <div className="relative flex flex-col items-center p-4 border-2 border-dashed rounded-lg">
+                                    <div className="w-full space-y-2 sm:w-1/3">
+                                        <Label htmlFor="foto_wakil" className="italic">
+                                            Foto 3x4 <span className="text-destructive">*</span>
+                                        </Label>
+                                        <div className="relative flex flex-col items-center rounded-lg border-2 border-dashed p-4">
                                             {form.data.foto_wakil_preview ? (
                                                 <div className="space-y-4">
-                                                    <img 
-                                                        src={form.data.foto_wakil_preview} 
-                                                        alt="Preview" 
-                                                        className="w-full h-[200px] object-cover rounded-lg shadow-sm"
+                                                    <img
+                                                        src={form.data.foto_wakil_preview}
+                                                        alt="Preview"
+                                                        className="h-[200px] w-full rounded-lg object-cover shadow-sm"
                                                     />
                                                     <Button
                                                         type="button"
@@ -366,20 +417,42 @@ export default function Create() {
                                                         className="w-full"
                                                         onClick={() => document.getElementById('foto_wakil')?.click()}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="mr-2 h-4 w-4"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                                                            />
                                                         </svg>
                                                         Ganti Foto
                                                     </Button>
                                                 </div>
                                             ) : (
                                                 <div className="space-y-4">
-                                                    <div className="flex flex-col items-center justify-center w-full h-[200px] bg-muted/30 rounded-lg">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 mb-2 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    <div className="bg-muted/30 flex h-[200px] w-full flex-col items-center justify-center rounded-lg">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="text-muted-foreground mb-2 h-8 w-8"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                            />
                                                         </svg>
-                                                        <p className="text-sm text-muted-foreground text-center">Belum ada foto</p>
-                                                        <p className="text-xs text-muted-foreground mt-1">Format: JPG, PNG (Max. 2MB)</p>
+                                                        <p className="text-muted-foreground text-center text-sm">Belum ada foto</p>
+                                                        <p className="text-muted-foreground mt-1 text-xs">Format: JPG, PNG (Max. 2MB)</p>
                                                     </div>
                                                     <Button
                                                         type="button"
@@ -387,8 +460,19 @@ export default function Create() {
                                                         className="w-full"
                                                         onClick={() => document.getElementById('foto_wakil')?.click()}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="mr-2 h-4 w-4"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                                                            />
                                                         </svg>
                                                         Upload Foto
                                                     </Button>
@@ -401,9 +485,7 @@ export default function Create() {
                                                 accept="image/*"
                                                 className="hidden"
                                             />
-                                            {form.errors.foto_wakil && (
-                                                <p className="text-xs text-destructive mt-2">{form.errors.foto_wakil}</p>
-                                            )}
+                                            {form.errors.foto_wakil && <p className="text-destructive mt-2 text-xs">{form.errors.foto_wakil}</p>}
                                         </div>
                                     </div>
                                 </div>
@@ -411,45 +493,45 @@ export default function Create() {
 
                             {/* Visi & Misi */}
                             <div className="space-y-6">
-                                <div className="pb-4 border-b">
-                                    <h3 className="text-lg font-semibold text-primary">Visi & Misi</h3>
-                                    <p className="text-sm text-muted-foreground">Visi dan misi kandidat</p>
+                                <div className="border-b pb-4">
+                                    <h3 className="text-primary text-lg font-semibold">Visi & Misi</h3>
+                                    <p className="text-muted-foreground text-sm">Visi dan misi kandidat</p>
                                 </div>
 
                                 <div className="space-y-6">
                                     <div className="space-y-2">
-                                        <Label htmlFor="visi">Visi <span className="text-destructive">*</span></Label>
+                                        <Label htmlFor="visi">
+                                            Visi <span className="text-destructive">*</span>
+                                        </Label>
                                         <Textarea
                                             id="visi"
                                             value={form.data.visi}
-                                            onChange={e => form.setData('visi', e.target.value)}
+                                            onChange={(e) => form.setData('visi', e.target.value)}
                                             placeholder="Masukkan visi (satu per baris)"
-                                            className={`min-h-[100px] ${form.errors.visi ? "border-destructive" : ""}`}
+                                            className={`min-h-[100px] ${form.errors.visi ? 'border-destructive' : ''}`}
                                         />
                                         {form.errors.visi ? (
-                                            <p className="text-xs text-destructive">{form.errors.visi}</p>
+                                            <p className="text-destructive text-xs">{form.errors.visi}</p>
                                         ) : (
-                                            <p className="text-xs text-muted-foreground">
-                                                Pisahkan setiap visi dengan baris baru (Enter)
-                                            </p>
+                                            <p className="text-muted-foreground text-xs">Pisahkan setiap visi dengan baris baru (Enter)</p>
                                         )}
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="misi">Misi <span className="text-destructive">*</span></Label>
+                                        <Label htmlFor="misi">
+                                            Misi <span className="text-destructive">*</span>
+                                        </Label>
                                         <Textarea
                                             id="misi"
                                             value={form.data.misi}
-                                            onChange={e => form.setData('misi', e.target.value)}
+                                            onChange={(e) => form.setData('misi', e.target.value)}
                                             placeholder="Masukkan misi (satu per baris)"
-                                            className={`min-h-[100px] ${form.errors.misi ? "border-destructive" : ""}`}
+                                            className={`min-h-[100px] ${form.errors.misi ? 'border-destructive' : ''}`}
                                         />
                                         {form.errors.misi ? (
-                                            <p className="text-xs text-destructive">{form.errors.misi}</p>
+                                            <p className="text-destructive text-xs">{form.errors.misi}</p>
                                         ) : (
-                                            <p className="text-xs text-muted-foreground">
-                                                Pisahkan setiap misi dengan baris baru (Enter)
-                                            </p>
+                                            <p className="text-muted-foreground text-xs">Pisahkan setiap misi dengan baris baru (Enter)</p>
                                         )}
                                     </div>
                                 </div>
@@ -462,7 +544,7 @@ export default function Create() {
                                 <Button type="submit" disabled={form.processing} className="min-w-[200px]">
                                     {form.processing ? (
                                         <div className="flex items-center gap-2">
-                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                                             <span>Menyimpan...</span>
                                         </div>
                                     ) : (
@@ -478,4 +560,4 @@ export default function Create() {
             </div>
         </AppLayout>
     );
-} 
+}
