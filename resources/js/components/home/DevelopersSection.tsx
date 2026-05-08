@@ -50,13 +50,13 @@ export default function DevelopersSection() {
                     <div className="space-y-2">
                         <div className="inline-flex items-center rounded-full border border-red-600 px-3 py-1 text-sm font-semibold text-red-600">
                             <Code2 className="mr-1.5 h-4 w-4" />
-                            Meet The Team
+                            WE ARE COOKING
                         </div>
                         <h2 className="text-3xl font-bold tracking-tighter text-red-700 sm:text-5xl">
-                            Tim Pengembang
+                            Developers
                         </h2>
                         <p className="text-muted-foreground max-w-[900px] text-sm md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                            Dibangun dengan dedikasi oleh mahasiswa STMIK-AMIK Jayanusa
+                            Dibangun dengan dedikasi oleh Alumni STMIK-AMIK Jayanusa
                         </p>
                     </div>
                 </div>
