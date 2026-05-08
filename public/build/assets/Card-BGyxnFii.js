@@ -1,1 +1,0 @@
-import{j as d}from"./app-BpwEkOiy.js";const e=({children:r,className:o="",...s})=>d.jsx("div",{className:`bg-card text-card-foreground rounded-lg border shadow-sm ${o}`,...s,children:r});export{e as C};
