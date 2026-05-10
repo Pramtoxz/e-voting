@@ -66,6 +66,14 @@
   If we ever want to remove these styles, we need to add an explicit border
   color utility to any element that depends on these defaults.
 */
+@font-face {
+    font-family: 'Komika Axis';
+    src: url('/font/KOMIKAX_.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 @layer base {
     *,
     ::after,
@@ -214,4 +222,14 @@
     video::-webkit-media-controls-panel {
         width: calc(100% + 30px);
     }
+}
+
+/* Hide scrollbar for marquee */
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
 }

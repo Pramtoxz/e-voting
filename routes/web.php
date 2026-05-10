@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 // Public Routes - dapat diakses tanpa login
 Route::get('home', [HomeController::class, 'index'])->name('home');
+Route::get('/show', [HomeController::class, 'show'])->name('show');
 Route::get('/voting-results', [VotingResultsController::class, 'index'])->name('voting.results');
 Route::get('/api/check-countdown', [VotingResultsController::class, 'checkCountdown'])->name('api.check-countdown');
 Route::get('/voted-students', [VotingController::class, 'getVotedStudents'])->name('voting.students');

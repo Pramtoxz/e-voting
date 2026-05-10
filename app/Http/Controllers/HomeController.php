@@ -16,6 +16,14 @@ class HomeController extends Controller
         ]);
     }
 
+    public function show()
+    {
+        $kandidat = Kandidat::all();
+        return Inertia::render('Show', [
+            'kandidat' => $kandidat,
+        ]);
+    }
+
     public function kandidatDetail($id)
     {
         $kandidat = [

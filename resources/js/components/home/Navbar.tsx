@@ -74,7 +74,7 @@ export default function Navbar({ user }: NavbarProps) {
                         }`}
                     >
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md bg-white ring-2 ring-red-600">
+                            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md bg-white">
                                 <img src={LogoJayanusa} alt="Logo Jayanusa" className="h-full w-full object-contain" />
                             </div>
                             <div className="grid flex-1 text-left">

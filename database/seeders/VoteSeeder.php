@@ -52,7 +52,7 @@ class VoteSeeder extends Seeder
             $selectedNomorUrut = $faker->randomElement($nomorUrut);
 
             // Nama file foto bukti yang tetap sama
-            $fotoFileName = 'vote_bukti/bukti_1745358412_2010036.jpg';
+            $fotoFileName = 'vote_bukti/default.jpg';
 
             // Timestmap acak dalam 7 hari terakhir
             $timestamp = $faker->dateTimeBetween('-7 days', 'now');
