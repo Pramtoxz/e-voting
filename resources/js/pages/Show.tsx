@@ -337,9 +337,7 @@ function AdOverlay({ adIndex, visible, onClose }: { adIndex: number; visible: bo
                     {isPartnership ? (
                         /* === PARTNERSHIP SLIDE === */
                         <div className="px-8 py-6 sm:px-12 sm:py-8">
-                            <p className="mb-5 text-center text-xs font-black tracking-[0.3em] text-red-400 uppercase sm:text-sm">
-                                Partnership — Alumni STMIK-AMIK Jayanusa
-                            </p>
+                            <p className="mb-5 text-center text-xs font-black tracking-[0.3em] text-red-400 uppercase sm:text-sm">Partnership</p>
                             <div className="flex items-center justify-center gap-8">
                                 <div className="h-28 w-28 flex-shrink-0 overflow-hidden rounded-full border-2 border-red-200 shadow-lg sm:h-36 sm:w-36">
                                     <img src={PARTNERSHIP.image} alt={PARTNERSHIP.name} className="h-full w-full object-cover" />
