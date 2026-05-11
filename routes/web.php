@@ -50,6 +50,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/settings/force-show-results', [SettingController::class, 'forceShowResults'])->name('settings.force-show');
         Route::post('/settings/activate-countdown', [SettingController::class, 'activateCountdown'])->name('settings.activate-countdown');
         Route::post('/settings/toggle-vote-active', [SettingController::class, 'toggleVoteActive'])->name('settings.toggle-vote-active');
+        Route::post('/settings/test-vote', [SettingController::class, 'testVote'])->name('settings.test-vote');
+        Route::post('/settings/clear-test-votes', [SettingController::class, 'clearTestVotes'])->name('settings.clear-test-votes');
     });
 });
 

@@ -1,9 +1,10 @@
-import GarudaImage from '@/assets/garuda.webp';
+﻿import GarudaImage from '@/assets/garuda.webp';
+import DramaticReveal from '@/components/voting-results/DramaticReveal';
 import Layout from '@/Layout/MainLayout';
-import { Head } from '@inertiajs/react';
-import { AlertTriangle, Award, BarChart, Calendar, Clock, TrendingUp, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { getPemiraYear } from '@/utils/date';
+import { Head } from '@inertiajs/react';
+import { AlertTriangle, BarChart, Clock, Crown, Trophy } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Kandidat {
     id: number;
@@ -38,15 +39,28 @@ interface VotingResultsProps {
 
 export default function VotingResults({ kandidat, totalVotes, totalVoters, showResults, showCountdown, countdownEndTime, auth }: VotingResultsProps) {
     const pemiraYear = getPemiraYear();
-    
+
     // State untuk countdown
     const [timeRemaining, setTimeRemaining] = useState({
         days: 0,
         hours: 0,
-        minutes: 0, 
+        minutes: 0,
         seconds: 0,
     });
     const [countdownFinished, setCountdownFinished] = useState(false);
+
+    // State untuk dramatic reveal animation
+    const [showReveal, setShowReveal] = useState(() => {
+        // Tampilkan reveal hanya jika hasil sedang ditampilkan & belum pernah dilihat session ini
+        if (typeof window === 'undefined') return false;
+        if (!showResults) return false;
+        return sessionStorage.getItem('pemira_reveal_seen') !== '1';
+    });
+
+    const handleRevealFinish = () => {
+        sessionStorage.setItem('pemira_reveal_seen', '1');
+        setShowReveal(false);
+    };
 
     // CSS untuk animasi
     const animationStyles = `
@@ -58,41 +72,41 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
     .garuda-float {
       animation: floating 3s ease-in-out infinite;
     }
-    
+
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(10px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    
+
     .fade-in {
       animation: fadeIn 0.5s ease-out forwards;
     }
-    
+
     .fade-in-delay-1 {
       animation: fadeIn 0.5s ease-out 0.1s forwards;
       opacity: 0;
     }
-    
+
     .fade-in-delay-2 {
       animation: fadeIn 0.5s ease-out 0.2s forwards;
       opacity: 0;
     }
-    
+
     .fade-in-delay-3 {
       animation: fadeIn 0.5s ease-out 0.3s forwards;
       opacity: 0;
     }
-    
+
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
-    
+
     .pulse-winner {
       animation: pulse 2s ease-in-out infinite;
     }
-    
+
     .hover-scale:hover {
       transform: scale(1.02);
       transition: transform 0.3s ease;
@@ -137,6 +151,8 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
             if (remaining.days === 0 && remaining.hours === 0 && remaining.minutes === 0 && remaining.seconds === 0) {
                 clearInterval(timer);
                 setCountdownFinished(true);
+                // Hapus flag reveal agar reveal tampil setelah reload
+                sessionStorage.removeItem('pemira_reveal_seen');
                 window.location.reload();
             }
         }, 1000);
@@ -291,7 +307,7 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
                         <div className="container mx-auto">
                             <p className="mx-auto max-w-2xl">
                                 "we are cooking🔥"
-                                <span className="mt-2 block font-semibold not-italic">— Rafi Chandra - Pramudito Metra</span>
+                                <span className="mt-2 block font-semibold not-italic">â€” Rafi Chandra - Pramudito Metra</span>
                             </p>
                         </div>
                     </div>
@@ -371,149 +387,90 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
         minute: '2-digit',
     });
 
-    // Tampilan modern hasil voting
+    // Tampilan modern hasil voting — layout proyektor (1 layar, no scroll, no navbar)
     return (
-        <Layout title={`Hasil Voting - PEMIRA ${pemiraYear}`} auth={auth}>
+        <>
             <Head title={`Hasil Voting - PEMIRA ${pemiraYear}`} />
             <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
 
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-red-900 via-red-800 to-red-700">
-                {/* Background pattern overlay */}
+            {/* Dramatic reveal overlay */}
+            {showReveal && <DramaticReveal kandidat={kandidat} totalVotes={totalVotes} onFinish={handleRevealFinish} />}
+
+            {/* Full viewport — tidak pakai Layout agar tidak ada navbar */}
+            <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-gradient-to-br from-red-950 via-red-900 to-red-800">
+                {/* Batik pattern */}
                 <div
-                    className="absolute inset-0 bg-repeat opacity-5"
+                    className="absolute inset-0 opacity-[0.07]"
                     style={{
                         backgroundImage:
-                            "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E\")",
+                            "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='5' cy='5' r='2.5'/%3E%3Ccircle cx='25' cy='25' r='2.5'/%3E%3C/g%3E%3C/svg%3E\")",
                     }}
                 />
+                <div className="pointer-events-none absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-red-500/20 blur-[150px]" />
+                <div className="pointer-events-none absolute bottom-0 left-0 h-[600px] w-[600px] rounded-full bg-white/5 blur-[150px]" />
 
-                <div className="relative z-10 container mx-auto flex flex-grow flex-col px-4 py-8">
-                    {/* Header dengan judul dan informasi voting */}
-                    <div className="fade-in mb-8 border-b border-white/10 pb-6 text-center text-white">
-                        <h1 className="mb-2 text-3xl font-bold md:text-5xl">Hasil Pemilihan Raya {pemiraYear}</h1>
-                        <div className="mb-6 flex items-center justify-center text-sm text-white/70">
-                            <Calendar className="mr-1 h-4 w-4" />
-                            <span>Penghitungan suara selesai pada {formattedDate}</span>
+                <div className="relative z-10 flex h-full flex-col px-8 py-5 xl:px-14 xl:py-7">
+                    {/* ── HEADER ── */}
+                    <div className="mb-4 flex items-center justify-between text-white">
+                        <div className="flex items-center gap-3">
+                            <img src={GarudaImage} alt="Garuda" className="h-10 w-auto opacity-80 xl:h-12" />
+                            <div>
+                                <p className="text-[10px] font-black tracking-[0.3em] text-white/60 uppercase xl:text-xs">Hasil Resmi</p>
+                                <h1 className="text-xl leading-tight font-black xl:text-3xl">Pemilihan Raya Mahasiswa {pemiraYear}</h1>
+                            </div>
                         </div>
-
-                        {/* Statistik Utama dalam Card Glassmorphism */}
-                        <div className="fade-in-delay-1 mx-auto mt-8 grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-3">
-                            <div className="rounded-xl border border-white/20 bg-white/10 p-5 shadow-lg backdrop-blur-sm">
-                                <div className="mb-3 flex items-center justify-center">
-                                    <BarChart className="mr-2 h-6 w-6 text-yellow-300" />
-                                </div>
-                                <div className="mb-1 text-4xl font-bold text-white">{totalVotes}</div>
-                                <div className="text-sm text-white/70">Total Suara Sah</div>
-                            </div>
-
-                            <div className="rounded-xl border border-white/20 bg-white/10 p-5 shadow-lg backdrop-blur-sm">
-                                <div className="mb-3 flex items-center justify-center">
-                                    <Users className="mr-2 h-6 w-6 text-yellow-300" />
-                                </div>
-                                <div className="mb-1 text-4xl font-bold text-white">{totalVoters}</div>
-                                <div className="text-sm text-white/70">Total Pemilih Terdaftar</div>
-                            </div>
-
-                            <div className="rounded-xl border border-white/20 bg-white/10 p-5 shadow-lg backdrop-blur-sm">
-                                <div className="mb-3 flex items-center justify-center">
-                                    <TrendingUp className="mr-2 h-6 w-6 text-yellow-300" />
-                                </div>
-                                <div className="mb-1 text-4xl font-bold text-white">{totalVotesPercentage.toFixed(1)}%</div>
-                                <div className="text-sm text-white/70">Tingkat Partisipasi</div>
+                        <div className="text-right">
+                            <p className="text-[10px] text-white/50 xl:text-xs">{formattedDate}</p>
+                            <div className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-black text-white xl:text-xs">
+                                <BarChart className="h-3 w-3" />
+                                {totalVotes} Suara Sah
                             </div>
                         </div>
                     </div>
 
-                    {/* Pemenang Utama dengan highlight */}
-                    {pemenang && (
-                        <div className="fade-in-delay-2 mb-12">
-                            <h2 className="mb-6 flex items-center justify-center text-center text-2xl font-bold text-white">
-                                <Award className="mr-2 h-6 w-6 text-yellow-400" />
-                                Pemenang Pemilihan Raya {pemiraYear}
-                            </h2>
+                    {/* ── MAIN CONTENT ── */}
+                    <div className="flex min-h-0 flex-1 gap-5 xl:gap-7">
+                        {/* ── KOLOM KIRI: semua kandidat ── */}
+                        <div className="flex w-64 flex-shrink-0 flex-col gap-3 xl:w-72">
+                            <p className="text-[10px] font-black tracking-[0.3em] text-white/50 uppercase xl:text-xs">Perolehan Suara</p>
 
-                            <div className="pulse-winner mx-auto max-w-4xl overflow-hidden rounded-xl border-2 border-yellow-400 bg-gradient-to-r from-red-800 to-red-700 shadow-xl">
-                                <div className="flex items-center justify-between bg-yellow-500/10 px-4 py-1.5 font-bold text-yellow-300">
-                                    <span>PASANGAN PEMENANG</span>
-                                    <span className="rounded bg-yellow-500 px-2 py-0.5 text-xs text-black">
-                                        {totalVotes > 0 ? ((pemenang.jumlah_suara / totalVotes) * 100).toFixed(1) : 0}% Suara
-                                    </span>
-                                </div>
-
-                                <div className="flex flex-col items-center gap-8 p-6 md:flex-row">
-                                    {/* Foto Pemenang */}
-                                    <div className="w-40 md:w-48">
-                                        <div className="aspect-square overflow-hidden rounded-full border-4 border-yellow-400 shadow-xl">
-                                            {pemenang.foto_presiden ? (
-                                                <img
-                                                    src={`/storage/${pemenang.foto_presiden}`}
-                                                    alt={pemenang.nama_presiden}
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-500">
-                                                    Tidak ada foto
+                            <div className="flex flex-col gap-3 overflow-hidden">
+                                {sortedKandidat.map((k, index) => {
+                                    const pct = totalVotes > 0 ? (k.jumlah_suara / totalVotes) * 100 : 0;
+                                    const isWinner = k.id === pemenang?.id;
+                                    return (
+                                        <div
+                                            key={k.id}
+                                            className={`relative overflow-hidden rounded-2xl ${
+                                                isWinner ? 'border-2 border-white/50 bg-white/15 shadow-lg' : 'border border-white/10 bg-white/5'
+                                            }`}
+                                        >
+                                            {/* Progress bar bg */}
+                                            <div
+                                                className="absolute inset-y-0 left-0 bg-gradient-to-r from-white/20 to-transparent"
+                                                style={{ width: `${pct}%` }}
+                                            />
+                                            <div className="relative p-3 xl:p-4">
+                                                {/* Rank + nama */}
+                                                <div className="mb-2 flex items-center gap-2">
+                                                    <div
+                                                        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-black xl:h-7 xl:w-7 ${isWinner ? 'bg-white text-red-700' : 'bg-white/15 text-white'}`}
+                                                    >
+                                                        {index + 1}
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-[10px] text-white/50">No. {k.nomor_urut}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-base font-black text-white xl:text-lg">{pct.toFixed(1)}%</p>
+                                                        <p className="text-[10px] text-white/50">{k.jumlah_suara} suara</p>
+                                                    </div>
                                                 </div>
-                                            )}
-                                        </div>
-                                    </div>
 
-                                    {/* Informasi Pemenang */}
-                                    <div className="flex-grow text-center md:text-left">
-                                        <div className="mb-2 text-5xl font-bold text-white md:text-6xl">No. {pemenang.nomor_urut}</div>
-                                        <h2 className="mb-3 text-2xl font-extrabold text-white md:text-3xl">{pemenang.nama}</h2>
-
-                                        <div className="mb-4 items-baseline gap-4 md:flex">
-                                            <span className="mb-2 inline-block rounded-full bg-yellow-500 px-4 py-1.5 text-lg font-bold text-black md:mb-0">
-                                                {pemenang.jumlah_suara} Suara
-                                            </span>
-                                            <span className="text-lg text-white/80">
-                                                dengan selisih {pemenang.jumlah_suara - (sortedKandidat[1]?.jumlah_suara || 0)} suara dari pesaing
-                                                terdekat
-                                            </span>
-                                        </div>
-
-                                        {pemenang.nama_presiden && pemenang.nama_wakil && (
-                                            <div className="mt-2 text-white/80">
-                                                <div className="text-lg font-semibold">
-                                                    {pemenang.nama_presiden} &amp; {pemenang.nama_wakil}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Peringkat Kandidat */}
-                    <div className="fade-in-delay-3 mb-12">
-                        <div className="mx-auto max-w-5xl space-y-4">
-                            {sortedKandidat.map((k, index) => {
-                                const percentage = totalVotes > 0 ? (k.jumlah_suara / totalVotes) * 100 : 0;
-                                const isPemenang = k.id === pemenang?.id;
-
-                                return (
-                                    <div
-                                        key={k.id}
-                                        className={`hover-scale overflow-hidden rounded-xl transition-all duration-300 ${
-                                            isPemenang ? 'border-2 border-yellow-400 shadow-lg' : 'border border-white/10'
-                                        }`}
-                                    >
-                                        <div className="flex flex-col md:flex-row">
-                                            {/* Header dengan peringkat dan nomor urut */}
-                                            <div className="flex items-center justify-between bg-gradient-to-r from-red-900 to-red-800 px-4 py-3 md:w-40 md:justify-start">
-                                                <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-bold text-white">
-                                                    {index + 1}
-                                                </div>
-                                                <div className="text-2xl font-bold text-white">No. {k.nomor_urut}</div>
-                                            </div>
-
-                                            {/* Informasi Kandidat */}
-                                            <div className="flex flex-grow flex-col items-center bg-red-800/80 p-4 text-white md:flex-row">
-                                                {/* Foto Kandidat */}
-                                                <div className="mb-3 w-20 md:mr-4 md:mb-0 md:w-16">
-                                                    <div className="aspect-square overflow-hidden rounded-full border-2 border-white/30 shadow-md">
+                                                {/* Duo foto kecil + nama */}
+                                                <div className="flex items-center gap-2">
+                                                    {/* Foto presiden */}
+                                                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border-2 border-white/40 xl:h-12 xl:w-12">
                                                         {k.foto_presiden ? (
                                                             <img
                                                                 src={`/storage/${k.foto_presiden}`}
@@ -521,107 +478,201 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
                                                                 className="h-full w-full object-cover"
                                                             />
                                                         ) : (
-                                                            <div className="flex h-full w-full items-center justify-center bg-gray-200 text-xs text-gray-500">
-                                                                Tidak ada foto
+                                                            <div className="flex h-full w-full items-center justify-center bg-white/10">
+                                                                <Crown className="h-4 w-4 text-white/50" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {/* Foto wakil */}
+                                                    <div className="-ml-3 h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border-2 border-white/40 xl:h-12 xl:w-12">
+                                                        {k.foto_wakil ? (
+                                                            <img
+                                                                src={`/storage/${k.foto_wakil}`}
+                                                                alt={k.nama_wakil}
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-full w-full items-center justify-center bg-white/10">
+                                                                <Crown className="h-4 w-4 text-white/50" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="truncate text-xs font-black text-white xl:text-sm">{k.nama_presiden}</p>
+                                                        <p className="truncate text-[10px] text-white/60">&amp; {k.nama_wakil}</p>
+                                                    </div>
+                                                    {isWinner && (
+                                                        <div className="flex-shrink-0 rounded-full bg-white px-2 py-0.5 text-[9px] font-black text-red-700 uppercase xl:text-[10px]">
+                                                            Menang
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Footer */}
+                            <div className="mt-auto border-t border-white/10 pt-3 text-center">
+                                <p className="text-[10px] text-white/30">PEMIRA {pemiraYear} &bull; Resmi Diumumkan</p>
+                            </div>
+                        </div>
+
+                        {/* ── KOLOM KANAN: Pemenang besar ── */}
+                        {pemenang && (
+                            <div className="flex min-h-0 flex-1 flex-col">
+                                <p className="mb-3 flex items-center justify-center gap-2 text-[10px] font-black tracking-[0.35em] text-white/50 uppercase xl:text-xs">
+                                    <Crown className="h-3.5 w-3.5" />
+                                    Pemenang PEMIRA {pemiraYear}
+                                </p>
+
+                                <div className="flex min-h-0 flex-1 overflow-hidden rounded-3xl bg-white shadow-[0_20px_80px_rgba(0,0,0,0.4)]">
+                                    {/* Ribbon kiri vertikal */}
+                                    <div className="flex w-10 flex-shrink-0 items-center justify-center bg-gradient-to-b from-red-700 via-red-600 to-red-700 xl:w-12">
+                                        <p
+                                            className="rotate-180 text-[9px] font-black tracking-[0.4em] text-white uppercase xl:text-[10px]"
+                                            style={{ writingMode: 'vertical-rl' }}
+                                        >
+                                            Pasangan Terpilih
+                                        </p>
+                                    </div>
+
+                                    {/* Konten pemenang */}
+                                    <div className="flex min-h-0 flex-1 flex-col justify-between p-6 xl:p-8">
+                                        {/* Nomor urut */}
+                                        <div className="flex justify-center">
+                                            <div className="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-1.5 text-xs font-black tracking-widest text-red-700 uppercase xl:text-sm">
+                                                <Trophy className="h-3.5 w-3.5 text-red-600" />
+                                                Nomor Urut {pemenang.nomor_urut}
+                                            </div>
+                                        </div>
+
+                                        {/* Duo foto besar */}
+                                        <div className="flex items-center justify-center gap-6 xl:gap-12">
+                                            {/* Presiden */}
+                                            <div className="flex flex-col items-center text-center">
+                                                <div className="relative mb-3">
+                                                    <div className="absolute inset-0 -m-3 animate-pulse rounded-full bg-red-500/20 blur-2xl" />
+                                                    <div className="relative h-44 w-44 overflow-hidden rounded-full border-4 border-red-600 shadow-2xl xl:h-56 xl:w-56">
+                                                        {pemenang.foto_presiden ? (
+                                                            <img
+                                                                src={`/storage/${pemenang.foto_presiden}`}
+                                                                alt={pemenang.nama_presiden}
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-full w-full items-center justify-center bg-red-100">
+                                                                <Crown className="h-12 w-12 text-red-400" />
                                                             </div>
                                                         )}
                                                     </div>
                                                 </div>
+                                                <p className="text-[10px] font-bold tracking-widest text-red-600 uppercase xl:text-xs">
+                                                    Presiden Mahasiswa
+                                                </p>
+                                                <h2 className="mt-1 text-xl leading-tight font-black text-gray-900 xl:text-3xl">
+                                                    {pemenang.nama_presiden}
+                                                </h2>
+                                            </div>
 
-                                                {/* Informasi dan Progress Bar */}
-                                                <div className="flex w-full flex-grow flex-col justify-center text-center md:text-left">
-                                                    <div className="mb-1 flex flex-col md:flex-row md:items-center md:justify-between">
-                                                        <div>
-                                                            <h2 className="text-lg font-bold md:text-xl">{k.nama}</h2>
-                                                            {k.nama_presiden && k.nama_wakil && (
-                                                                <div className="text-sm text-white/70">
-                                                                    {k.nama_presiden} &amp; {k.nama_wakil}
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                            {/* Divider */}
+                                            <div className="flex flex-col items-center gap-2">
+                                                <div className="h-20 w-px bg-gray-200 xl:h-28" />
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-600 text-sm font-black text-white shadow-lg xl:h-12 xl:w-12 xl:text-base">
+                                                    &amp;
+                                                </div>
+                                                <div className="h-20 w-px bg-gray-200 xl:h-28" />
+                                            </div>
 
-                                                        <div className="mt-2 flex justify-center gap-2 md:mt-0 md:justify-end">
-                                                            <div className="rounded bg-white/20 px-3 py-1 text-sm font-medium">
-                                                                {k.jumlah_suara} Suara
+                                            {/* Wakil */}
+                                            <div className="flex flex-col items-center text-center">
+                                                <div className="relative mb-3">
+                                                    <div
+                                                        className="absolute inset-0 -m-3 animate-pulse rounded-full bg-red-500/20 blur-2xl"
+                                                        style={{ animationDelay: '0.7s' }}
+                                                    />
+                                                    <div className="relative h-44 w-44 overflow-hidden rounded-full border-4 border-red-600 shadow-2xl xl:h-56 xl:w-56">
+                                                        {pemenang.foto_wakil ? (
+                                                            <img
+                                                                src={`/storage/${pemenang.foto_wakil}`}
+                                                                alt={pemenang.nama_wakil}
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-full w-full items-center justify-center bg-red-100">
+                                                                <Crown className="h-12 w-12 text-red-400" />
                                                             </div>
-
-                                                            {isPemenang && (
-                                                                <div className="rounded bg-yellow-500 px-2 py-1 text-sm font-bold text-black">
-                                                                    PEMENANG
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="mt-3">
-                                                        <div className="mb-1 flex items-center justify-between">
-                                                            <div className="text-sm font-medium">Persentase Suara</div>
-                                                            <div className="text-sm font-bold text-yellow-300">{percentage.toFixed(1)}%</div>
-                                                        </div>
-
-                                                        {/* Progress Bar with animation */}
-                                                        <div className="h-3 w-full overflow-hidden rounded-full bg-red-900/70 shadow-inner">
-                                                            <div
-                                                                className="h-full bg-gradient-to-r from-yellow-500 to-yellow-400 transition-all duration-1000"
-                                                                style={{ width: `${percentage}%` }}
-                                                            ></div>
-                                                        </div>
+                                                        )}
                                                     </div>
                                                 </div>
+                                                <p className="text-[10px] font-bold tracking-widest text-red-600 uppercase xl:text-xs">
+                                                    Wakil Presiden
+                                                </p>
+                                                <h2 className="mt-1 text-xl leading-tight font-black text-gray-900 xl:text-3xl">
+                                                    {pemenang.nama_wakil}
+                                                </h2>
+                                            </div>
+                                        </div>
+
+                                        {/* Persentase */}
+                                        <div className="mt-4 flex justify-center">
+                                            <div className="inline-flex items-baseline gap-3 rounded-2xl bg-gradient-to-r from-red-700 to-red-600 px-8 py-3 text-white shadow-xl xl:px-10 xl:py-4">
+                                                <span className="text-4xl font-black xl:text-5xl">
+                                                    {totalVotes > 0 ? ((pemenang.jumlah_suara / totalVotes) * 100).toFixed(1) : 0}%
+                                                </span>
+                                                <span className="text-xs font-bold tracking-widest uppercase xl:text-sm">
+                                                    {pemenang.jumlah_suara} suara
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Informasi Tambahan dalam Grid */}
-                    <div className="mx-auto mt-8 grid grid-cols-1 md:max-w-5xl">
-                        <div className="rounded-xl border border-white/20 bg-white/10 p-5 shadow-lg backdrop-blur-sm">
-                            <h3 className="mb-3 flex items-center text-lg font-bold text-white">
-                                <Calendar className="mr-2 h-5 w-5 text-yellow-300" />
-                                Informasi Pemilihan
-                            </h3>
-                            <ul className="space-y-3 text-sm text-white/80">
-                                <li className="flex items-center justify-between border-b border-white/10 pb-2">
-                                    <span>Tanggal Pelaksanaan:</span>
-                                    <span className="font-medium text-white">{formattedDate}</span>
-                                </li>
-                                <li className="flex items-center justify-between border-b border-white/10 pb-2">
-                                    <span>Jumlah Kandidat:</span>
-                                    <span className="font-medium text-white">{kandidat.length} Pasangan</span>
-                                </li>
-                                <li className="flex items-center justify-between border-b border-white/10 pb-2">
-                                    <span>Suara Sah:</span>
-                                    <span className="font-medium text-white">{totalVotes} Suara</span>
-                                </li>
-                                <li className="flex items-center justify-between border-b border-white/10 pb-2">
-                                    <span>Partisipasi:</span>
-                                    <span className="font-medium text-white">{totalVotesPercentage.toFixed(1)}%</span>
-                                </li>
-                                <li className="flex items-center justify-between">
-                                    <span>Tidak Memilih:</span>
-                                    <span className="font-medium text-white">{totalVoters - totalVotes} Pemilih</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="mt-12 border-t border-white/10 pt-10 text-center text-sm text-white/70">
-                        <p>© {pemiraYear} Pemilihan Raya Universitas • Panitia PEMIRA {pemiraYear}</p>
-                        <p className="mt-2 text-xs text-white/50">Data terakhir diperbarui: {formattedDateTime}</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Floating Garuda di bagian bawah */}
-                <div className="pointer-events-none fixed right-0 bottom-0 z-0 opacity-20 md:opacity-30">
-                    <div className="garuda-float">
-                        <img src={GarudaImage} alt="Garuda Pancasila" className="h-48 w-auto md:h-64" />
-                    </div>
+                {/* Garuda watermark pojok kanan bawah */}
+                <div className="pointer-events-none absolute right-4 bottom-4 z-0 opacity-10">
+                    <img src={GarudaImage} alt="Garuda Pancasila" className="h-48 w-auto xl:h-64" />
                 </div>
             </div>
-        </Layout>
+        </>
+    );
+}
+
+/* ============ HELPER COMPONENTS ============ */
+
+function MiniStatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+    return (
+        <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm xl:px-5 xl:py-3.5">
+            <div className="mb-1 flex items-center gap-2 text-white/60">
+                {icon}
+                <span className="text-[10px] font-bold tracking-widest uppercase xl:text-xs">{label}</span>
+            </div>
+            <div className="text-2xl font-black text-white xl:text-3xl">{value}</div>
+        </div>
+    );
+}
+
+function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+    return (
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm md:p-6">
+            <div className="mb-3 flex items-center gap-2 text-white/70">
+                {icon}
+                <span className="text-xs font-bold tracking-widest uppercase md:text-sm">{label}</span>
+            </div>
+            <div className="text-3xl font-black text-white md:text-4xl">{value}</div>
+        </div>
+    );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="flex items-center justify-between border-b border-white/10 pb-2.5 last:border-0 md:pb-3">
+            <span className="text-sm text-white/60 md:text-base">{label}</span>
+            <span className="text-sm font-bold text-white md:text-base">{value}</span>
+        </div>
     );
 }

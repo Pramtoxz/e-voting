@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\VoteCreated;
 use App\Http\Controllers\Controller;
+use App\Models\Kandidat;
 use App\Models\Setting;
+use App\Models\User;
+use App\Models\Vote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -112,6 +116,71 @@ class SettingController extends Controller
             DB::rollBack();
             Log::error('Error saat mengaktifkan countdown: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengaktifkan countdown.');
+        }
+    }
+
+    /**
+     * Membuat vote dummy untuk testing broadcast realtime.
+     *
+     * Ambil user mahasiswa acak yang belum memilih (data dari MahasiswaSeeder)
+     * lalu buat Vote dengan foto_bukti default, kemudian broadcast event VoteCreated.
+     */
+    public function testVote(Request $request)
+    {
+        try {
+            $count = (int) $request->input('count', 1);
+            $count = max(1, min($count, 10));
+
+            // Pool nomor_urut dari kandidat terdaftar
+            $nomorUruts = Kandidat::pluck('nomor_urut')->all();
+            if (empty($nomorUruts)) {
+                return redirect()->back()->with('error', 'Belum ada kandidat. Tambahkan kandidat terlebih dahulu.');
+            }
+
+            // Mahasiswa yang belum memilih
+            $votedUsernames = Vote::pluck('username');
+            $mahasiswa = User::where('role', 'mahasiswa')
+                ->whereNotIn('username', $votedUsernames)
+                ->inRandomOrder()
+                ->limit($count)
+                ->get();
+
+            if ($mahasiswa->isEmpty()) {
+                return redirect()->back()->with('error', 'Semua mahasiswa sudah memilih. Tidak ada data testing yang bisa dibuat.');
+            }
+
+            $created = 0;
+            foreach ($mahasiswa as $user) {
+                $vote = Vote::create([
+                    'username' => $user->username,
+                    'nomor_urut' => $nomorUruts[array_rand($nomorUruts)],
+                    'foto_bukti' => 'vote_bukti/default.jpg',
+                ]);
+
+                broadcast(new VoteCreated($vote));
+                $created++;
+            }
+
+            return redirect()->route('settings.index')
+                ->with('success', "Berhasil membuat {$created} vote testing dan broadcast ke halaman /show.");
+        } catch (\Exception $e) {
+            Log::error('Error saat membuat test vote: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat test vote: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Menghapus semua vote testing (yang memakai foto_bukti default).
+     */
+    public function clearTestVotes()
+    {
+        try {
+            $deleted = Vote::where('foto_bukti', 'vote_bukti/default.jpg')->delete();
+            return redirect()->route('settings.index')
+                ->with('success', "Berhasil menghapus {$deleted} vote testing.");
+        } catch (\Exception $e) {
+            Log::error('Error saat menghapus test vote: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus test vote: ' . $e->getMessage());
         }
     }
 }

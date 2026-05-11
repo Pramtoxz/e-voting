@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import AppLayout from '@/layouts/app-layout';
 import { PageProps } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { CheckCircle2, LockKeyhole, Timer, Trophy, Vote, XCircle } from 'lucide-react';
+import { CheckCircle2, FlaskConical, LockKeyhole, Timer, Trash2, Trophy, Vote, XCircle } from 'lucide-react';
+import { useState } from 'react';
 
 interface SettingsProps extends PageProps {
     showVotingResults: string;
@@ -16,6 +17,10 @@ export default function Settings({ showVotingResults, countdownActive, countdown
     const countdownForm = useForm({ countdown_minutes: '' });
     const forceShowForm = useForm({});
     const toggleVoteForm = useForm({});
+    const testVoteForm = useForm({ count: '1' });
+    const clearTestForm = useForm({});
+
+    const [testCount, setTestCount] = useState('1');
 
     const isCountdownActive = countdownActive === '1';
     const showResults = showVotingResults === '1';
@@ -25,8 +30,12 @@ export default function Settings({ showVotingResults, countdownActive, countdown
         if (!countdownEndTime) return '-';
         const endTime = new Date(countdownEndTime);
         return endTime.toLocaleString('id-ID', {
-            day: 'numeric', month: 'long', year: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
         });
     };
 
@@ -81,11 +90,14 @@ export default function Settings({ showVotingResults, countdownActive, countdown
                         <Card className={`mb-6 border-2 ${isVoteActive ? 'border-green-200' : 'border-red-200'}`}>
                             <CardHeader>
                                 <div className="flex items-center gap-3">
-                                    <div className={`flex h-10 w-10 items-center justify-center rounded-full ${isVoteActive ? 'bg-green-100' : 'bg-red-100'}`}>
-                                        {isVoteActive
-                                            ? <Vote className="h-5 w-5 text-green-600" />
-                                            : <LockKeyhole className="h-5 w-5 text-red-600" />
-                                        }
+                                    <div
+                                        className={`flex h-10 w-10 items-center justify-center rounded-full ${isVoteActive ? 'bg-green-100' : 'bg-red-100'}`}
+                                    >
+                                        {isVoteActive ? (
+                                            <Vote className="h-5 w-5 text-green-600" />
+                                        ) : (
+                                            <LockKeyhole className="h-5 w-5 text-red-600" />
+                                        )}
                                     </div>
                                     <div>
                                         <CardTitle>Buka / Tutup Voting</CardTitle>
@@ -96,11 +108,14 @@ export default function Settings({ showVotingResults, countdownActive, countdown
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <div className={`flex items-start gap-3 rounded-lg p-4 ${isVoteActive ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                                    {isVoteActive
-                                        ? <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                                        : <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
-                                    }
+                                <div
+                                    className={`flex items-start gap-3 rounded-lg p-4 ${isVoteActive ? 'border border-green-200 bg-green-50' : 'border border-red-200 bg-red-50'}`}
+                                >
+                                    {isVoteActive ? (
+                                        <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
+                                    ) : (
+                                        <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
+                                    )}
                                     <div>
                                         <p className={`font-semibold ${isVoteActive ? 'text-green-700' : 'text-red-700'}`}>
                                             {isVoteActive ? 'Voting sedang dibuka' : 'Voting sedang ditutup'}
@@ -117,10 +132,7 @@ export default function Settings({ showVotingResults, countdownActive, countdown
                                 <Button
                                     onClick={() => toggleVoteForm.post(route('settings.toggle-vote-active'))}
                                     disabled={toggleVoteForm.processing}
-                                    className={`w-full sm:w-auto ${isVoteActive
-                                        ? 'bg-red-600 hover:bg-red-700'
-                                        : 'bg-green-600 hover:bg-green-700'
-                                    }`}
+                                    className={`w-full sm:w-auto ${isVoteActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
                                 >
                                     {isVoteActive ? 'Tutup Voting' : 'Buka Voting'}
                                 </Button>
@@ -179,6 +191,68 @@ export default function Settings({ showVotingResults, countdownActive, countdown
                                     className="w-full bg-emerald-600 hover:bg-emerald-700 sm:w-auto"
                                 >
                                     <Trophy className="mr-2 h-4 w-4" /> Tampilkan Hasil Sekarang
+                                </Button>
+                            </CardFooter>
+                        </Card>
+
+                        {/* ── Testing Realtime Vote ── */}
+                        <Card className="mt-6 border-2 border-dashed border-orange-200">
+                            <CardHeader>
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+                                        <FlaskConical className="h-5 w-5 text-orange-600" />
+                                    </div>
+                                    <div>
+                                        <CardTitle>Testing Realtime Vote</CardTitle>
+                                        <CardDescription>
+                                            Simulasikan vote dari mahasiswa (data seeder) untuk menguji notifikasi realtime di halaman{' '}
+                                            <code className="rounded bg-gray-100 px-1">/show</code>.
+                                        </CardDescription>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="mb-4">
+                                    <label htmlFor="test_count" className="mb-1 block text-sm font-medium">
+                                        Jumlah Vote Sekaligus (1–10)
+                                    </label>
+                                    <input
+                                        id="test_count"
+                                        type="number"
+                                        min="1"
+                                        max="10"
+                                        className="block w-32 rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-400 focus:ring-orange-400 focus:outline-none sm:text-sm"
+                                        value={testCount}
+                                        onChange={(e) => {
+                                            setTestCount(e.target.value);
+                                            testVoteForm.setData('count', e.target.value);
+                                        }}
+                                    />
+                                </div>
+
+                                <div className="rounded-md border border-orange-100 bg-orange-50 p-3 text-sm text-orange-700">
+                                    Setiap klik akan membuat vote dari mahasiswa acak yang <strong>belum memilih</strong> dan langsung broadcast ke
+                                    halaman <strong>/show</strong>. Foto bukti diisi <code>vote_bukti/default.jpg</code>.
+                                </div>
+                            </CardContent>
+                            <CardFooter className="flex flex-col gap-3 sm:flex-row">
+                                <Button
+                                    onClick={() => testVoteForm.post(route('settings.test-vote'))}
+                                    disabled={testVoteForm.processing}
+                                    className="w-full bg-orange-500 hover:bg-orange-600 sm:w-auto"
+                                >
+                                    <FlaskConical className="mr-2 h-4 w-4" />
+                                    {testVoteForm.processing ? 'Memproses...' : `Kirim ${testCount} Vote Testing`}
+                                </Button>
+
+                                <Button
+                                    onClick={() => clearTestForm.post(route('settings.clear-test-votes'))}
+                                    disabled={clearTestForm.processing}
+                                    variant="outline"
+                                    className="w-full border-red-300 text-red-600 hover:bg-red-50 sm:w-auto"
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    {clearTestForm.processing ? 'Menghapus...' : 'Hapus Semua Vote Testing'}
                                 </Button>
                             </CardFooter>
                         </Card>

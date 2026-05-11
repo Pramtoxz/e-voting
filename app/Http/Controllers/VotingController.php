@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Events\VoteCreated;
 use App\Models\Kandidat;
 use App\Models\Vote;
 use App\Models\User;
@@ -79,13 +80,16 @@ class VotingController extends Controller
             $path = $fotoBukti->storeAs('vote_bukti', $filename, 'public');
 
             // Simpan data vote
-            Vote::create([
+            $vote = Vote::create([
                 'username' => Auth::user()->username,
                 'nomor_urut' => $request->nomor_urut,
                 'foto_bukti' => $path,
             ]);
 
             DB::commit();
+
+            // Broadcast event ke semua client yang sedang listen channel 'voting'
+            broadcast(new VoteCreated($vote))->toOthers();
 
             return redirect()->route('voting.thanks');
         } catch (\Exception $e) {

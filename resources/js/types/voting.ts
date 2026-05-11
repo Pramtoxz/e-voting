@@ -5,6 +5,7 @@ export interface VotedStudent {
     faculty: string;
     timestamp: string;
     foto_bukti?: string;
+    nomor_urut?: string | number;
 }
 
 export interface Kandidat {

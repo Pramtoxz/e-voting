@@ -5,30 +5,44 @@ import { useEffect, useRef } from 'react';
 interface VotedStudentsDarkProps {
     students: VotedStudent[];
     loading: boolean;
+    // prop ini tetap diterima agar tidak breaking, tapi kita pakai getStudentAvatar langsung
     getInitialAvatar: (student: VotedStudent) => string;
 }
 
 export default function VotedStudentsDark({ students, loading, getInitialAvatar }: VotedStudentsDarkProps) {
-    const scrollRef = useRef<HTMLDivElement>(null);
+    const trackRef = useRef<HTMLDivElement>(null);
+    // Simpan id yang sudah dirender agar tidak duplikat
+    const renderedIds = useRef<Set<number>>(new Set());
 
+    // Saat students berubah, append item baru ke track tanpa re-render seluruh list
     useEffect(() => {
-        if (!scrollRef.current || students.length === 0) return;
-        const el = scrollRef.current;
-        let animId: number, pos = 0;
-        const animate = () => {
-            pos += 0.6;
-            if (pos >= el.scrollWidth / 3) pos = 0;
-            el.scrollLeft = pos;
-            animId = requestAnimationFrame(animate);
-        };
-        animId = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(animId);
-    }, [students.length]);
+        if (!trackRef.current) return;
 
-    const tripled = [...students, ...students, ...students];
+        students.forEach((student) => {
+            if (renderedIds.current.has(student.id)) return;
+            renderedIds.current.add(student.id);
+
+            const item = buildItem(student, getInitialAvatar);
+            trackRef.current!.appendChild(item);
+        });
+    }, [students, getInitialAvatar]);
+
+    const shouldScroll = students.length >= 6;
+    const duration = Math.max(20, students.length * 3);
 
     return (
         <div className="relative">
+            <style>{`
+                @keyframes marquee-scroll {
+                    0%   { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+                .marquee-track {
+                    animation: marquee-scroll ${duration}s linear infinite;
+                    will-change: transform;
+                }
+            `}</style>
+
             {/* Header */}
             <div className="mb-3 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-end sm:text-left">
                 <div className="flex items-center gap-3">
@@ -39,7 +53,7 @@ export default function VotedStudentsDark({ students, loading, getInitialAvatar 
                         <h2 className="text-base font-bold text-white sm:text-lg">Mahasiswa yang Telah Memilih</h2>
                         <div className="mt-0.5 flex items-center gap-2 text-[11px] text-red-100">
                             <Clock className="h-3 w-3" />
-                            <span>Update real-time setiap 5 detik</span>
+                            <span>Pembaruan realtime otomatis</span>
                         </div>
                     </div>
                 </div>
@@ -66,39 +80,57 @@ export default function VotedStudentsDark({ students, loading, getInitialAvatar 
                     <p className="text-sm text-white/60">Belum ada mahasiswa yang memilih</p>
                 </div>
             ) : (
-                <div ref={scrollRef} className="hide-scrollbar flex overflow-x-hidden" style={{ scrollBehavior: 'auto' }}>
-                    <div className="flex gap-5 py-2 sm:gap-6">
-                        {tripled.map((student, index) => (
-                            <div key={`${student.id}-${index}`} className="flex flex-shrink-0 flex-col items-center gap-1.5">
-                                <div className="h-16 w-16 overflow-hidden rounded-full border-2 border-white/60 shadow-lg sm:h-20 sm:w-20 md:h-24 md:w-24">
-                                    <img
-                                        src={getInitialAvatar(student)}
-                                        alt={student.name}
-                                        className="h-full w-full object-cover"
-                                    />
-                                </div>
-                                <p className="max-w-[90px] truncate text-center text-[10px] font-semibold text-white sm:max-w-[110px] sm:text-xs md:text-sm">
-                                    {student.name}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+                <div className="overflow-hidden">
+                    {/*
+                        Track ini TIDAK pernah di-unmount — item baru di-append via DOM langsung.
+                        Untuk infinite marquee: track berisi 2 salinan (dikelola via CSS width 200%).
+                        Kita pakai translateX(-50%) sebagai endpoint.
+                    */}
+                    <div
+                        ref={trackRef}
+                        className={shouldScroll ? 'marquee-track flex gap-5 py-2 sm:gap-6' : 'flex flex-wrap gap-5 py-2 sm:gap-6'}
+                        style={shouldScroll ? { width: 'max-content' } : undefined}
+                    />
                 </div>
             )}
 
-            {/* Fade edges — pakai warna merah sesuai background */}
+            {/* Fade edges */}
             {students.length > 0 && (
                 <>
                     <div
-                        className="pointer-events-none absolute bottom-0 left-0 top-[52px] w-16 sm:w-24"
+                        className="pointer-events-none absolute top-[52px] bottom-0 left-0 w-16 sm:w-24"
                         style={{ background: 'linear-gradient(to right, rgba(185,28,28,0.95), transparent)' }}
                     />
                     <div
-                        className="pointer-events-none absolute bottom-0 right-0 top-[52px] w-16 sm:w-24"
+                        className="pointer-events-none absolute top-[52px] right-0 bottom-0 w-16 sm:w-24"
                         style={{ background: 'linear-gradient(to left, rgba(185,28,28,0.95), transparent)' }}
                     />
                 </>
             )}
         </div>
     );
+}
+
+/** Buat DOM node untuk satu item mahasiswa */
+function buildItem(student: VotedStudent, getAvatar: (s: VotedStudent) => string): HTMLElement {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'flex flex-shrink-0 flex-col items-center gap-1.5';
+
+    const imgWrapper = document.createElement('div');
+    imgWrapper.className = 'h-16 w-16 overflow-hidden rounded-full border-2 border-white/60 shadow-lg sm:h-20 sm:w-20 md:h-24 md:w-24';
+
+    const img = document.createElement('img');
+    img.src = getAvatar(student);
+    img.alt = student.name;
+    img.className = 'h-full w-full object-cover';
+
+    imgWrapper.appendChild(img);
+
+    const label = document.createElement('p');
+    label.className = 'max-w-[90px] truncate text-center text-[10px] font-semibold text-white sm:max-w-[110px] sm:text-xs md:text-sm';
+    label.textContent = student.name;
+
+    wrapper.appendChild(imgWrapper);
+    wrapper.appendChild(label);
+    return wrapper;
 }

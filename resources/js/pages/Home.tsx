@@ -8,13 +8,11 @@ import {
     Navbar,
     PancasilaPrinciples,
     VisiMisiDialog,
-    VotedStudentsMarquee,
 } from '@/components/home';
 import { BATIK_PATTERN_URL, GARUDA_URL, HOME_STYLES, TYPING_TEXT_ARRAY } from '@/constants/home';
 import { useTypingAnimation } from '@/hooks/useTypingAnimation';
 import { useVotedStudents } from '@/hooks/useVotedStudents';
 import { AuthProps, Kandidat } from '@/types/voting';
-import { getStudentAvatar } from '@/utils/avatar';
 import { getPemiraYear } from '@/utils/date';
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
@@ -61,7 +59,7 @@ export default function LandingPage({ kandidat, auth }: Props) {
                 <main className="w-full">
                     <HeroSection typingText={typingText} batikPatternUrl={BATIK_PATTERN_URL} isAuthenticated={!!auth?.user} />
 
-                    <VotedStudentsMarquee students={votedStudents} loading={loading} getInitialAvatar={getStudentAvatar} />
+                    {/* <VotedStudentsMarquee students={votedStudents} loading={loading} getInitialAvatar={getStudentAvatar} /> */}
 
                     <PancasilaPrinciples />
 
