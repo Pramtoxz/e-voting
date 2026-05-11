@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\Kandidat;
 use App\Models\Vote;
 use App\Models\User;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,12 @@ class VotingController extends Controller
      */
     public function index()
     {
+        // Cek apakah voting sedang dibuka
+        $voteActive = Setting::getValue('vote_active', '0');
+        if ($voteActive !== '1') {
+            return Inertia::render('Voting/Closed');
+        }
+
         // Cek apakah user sudah melakukan voting
         $hasVoted = Vote::where('username', Auth::user()->username)->exists();
 
@@ -39,6 +46,12 @@ class VotingController extends Controller
      */
     public function store(Request $request)
     {
+        // Cek apakah voting sedang dibuka
+        $voteActive = Setting::getValue('vote_active', '0');
+        if ($voteActive !== '1') {
+            return redirect()->route('voting.index');
+        }
+
         // Validasi request
         $request->validate([
             'nomor_urut' => 'required|exists:kandidats,nomor_urut',

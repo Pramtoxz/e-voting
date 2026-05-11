@@ -358,4 +358,4 @@ export default function Index({ kandidat, auth }: IndexProps) {
     );
 }
 
-Index.layout = (page: React.ReactNode) => <Layout children={page} title="Voting - PEMIRA" showFooter={false} />;
+Index.layout = (page: React.ReactElement) => <Layout auth={page.props.auth as IndexProps['auth']} children={page} title="Voting - PEMIRA" showFooter={false} />;

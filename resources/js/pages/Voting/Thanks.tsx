@@ -17,6 +17,14 @@ interface ThanksProps {
             nama_wakil: string;
         };
     };
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            username: string;
+        };
+    };
 }
 
 export default function Thanks({ vote }: ThanksProps) {
@@ -136,4 +144,4 @@ export default function Thanks({ vote }: ThanksProps) {
     );
 }
 
-Thanks.layout = (page: React.ReactNode) => <Layout children={page} title="Terima Kasih - PEMIRA" showFooter={false} />;
+Thanks.layout = (page: React.ReactElement) => <Layout auth={page.props.auth as ThanksProps['auth']} children={page} title="Terima Kasih - PEMIRA" showFooter={false} />;

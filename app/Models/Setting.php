@@ -41,7 +41,8 @@ class Setting extends Model
         $defaultSettings = [
             'show_voting_results' => '0',
             'countdown_active' => '0',
-            'countdown_end_time' => now()->addHours(1)->format('Y-m-d H:i:s')
+            'countdown_end_time' => now()->addHours(1)->format('Y-m-d H:i:s'),
+            'vote_active' => '0',
         ];
 
         foreach ($defaultSettings as $key => $value) {

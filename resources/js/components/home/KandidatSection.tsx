@@ -1,8 +1,10 @@
 import EpicBg from '@/assets/epic_bg.png';
 import { Kandidat } from '@/types/voting';
 import { getPemiraYear } from '@/utils/date';
+import { Link } from '@inertiajs/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Vote } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import KandidatCard from './KandidatCard';
 
@@ -335,8 +337,8 @@ export default function KandidatSection({ kandidat, onOpenDialog }: KandidatSect
                     </div>
                 </div>
 
-                {/* Bottom dramatic text */}
-                <div className="mt-16 flex flex-col items-center gap-3 md:mt-24">
+                {/* Bottom dramatic text + Vote Now */}
+                <div className="mt-16 flex flex-col items-center gap-4 md:mt-24">
                     <div className="h-[1px] w-32 bg-gradient-to-r from-transparent via-red-600/50 to-transparent" />
                     <p
                         className="text-center text-sm font-medium tracking-widest text-red-500/60 uppercase italic"
@@ -345,6 +347,17 @@ export default function KandidatSection({ kandidat, onOpenDialog }: KandidatSect
                         "Suaramu menentukan masa depan kampus"
                     </p>
                     <div className="h-[1px] w-32 bg-gradient-to-r from-transparent via-red-600/50 to-transparent" />
+
+                    {/* Vote Now Button */}
+                    <Link
+                        href="/voting"
+                        className="group relative mt-4 inline-flex items-center gap-3 overflow-hidden rounded-full bg-red-600 px-10 py-4 text-base font-bold uppercase tracking-widest text-white shadow-[0_0_30px_rgba(239,68,68,0.4)] transition-all duration-300 hover:bg-red-500 hover:shadow-[0_0_50px_rgba(239,68,68,0.7)] active:scale-95"
+                    >
+                        {/* Shine sweep */}
+                        <span className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] bg-white/20 transition-transform duration-700 group-hover:translate-x-full" />
+                        <Vote className="h-5 w-5" />
+                        Vote Now
+                    </Link>
                 </div>
             </div>
 

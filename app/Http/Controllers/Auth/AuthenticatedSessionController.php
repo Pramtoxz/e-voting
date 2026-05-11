@@ -14,31 +14,49 @@ use Inertia\Response;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Show the login page.
+     * Show the mahasiswa login page.
      */
     public function create(Request $request): Response
     {
         return Inertia::render('auth/login', [
+            'loginType' => 'mahasiswa',
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
         ]);
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Show the admin login page.
+     */
+    public function createAdmin(Request $request): Response
+    {
+        return Inertia::render('auth/login', [
+            'loginType' => 'admin',
+            'canResetPassword' => Route::has('password.request'),
+            'status' => $request->session()->get('status'),
+        ]);
+    }
+
+    /**
+     * Handle an incoming mahasiswa authentication request (external API).
      */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
         $request->session()->regenerate();
 
-        $user = Auth::user();
-        
-        // Redirect berdasarkan role
-        if ($user->role === 'admin') {
-            return redirect()->intended(route('dashboard', absolute: false));
-        }
-        return redirect()->intended(route('home', absolute: false)); // Selalu redirect ke home untuk mahasiswa
+        return redirect()->intended(route('home', absolute: false));
+    }
+
+    /**
+     * Handle an incoming admin authentication request (local database).
+     */
+    public function storeAdmin(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**

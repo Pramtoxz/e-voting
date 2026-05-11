@@ -8,15 +8,17 @@ import { useTypingAnimation } from '@/hooks/useTypingAnimation';
 import { LoginForm as LoginFormData, LoginProps } from '@/types/auth';
 import { getPemiraYear } from '@/utils/date';
 import { Head, useForm } from '@inertiajs/react';
-import { Shield, Vote } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { AlertCircle, Shield, Vote, X } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
-export default function Login({ status }: LoginProps) {
+export default function Login({ status, loginType = 'mahasiswa' }: LoginProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorBanner, setErrorBanner] = useState<string | null>(null);
     const pemiraYear = getPemiraYear();
+    const isAdmin = loginType === 'admin';
 
-    const { countdown, showCountdown, startCountdown } = useCountdown(3);
+    const { countdown, showCountdown, startCountdown, resetCountdown } = useCountdown(3);
     const typingText = useTypingAnimation(LOGIN_TYPING_TEXT_ARRAY);
     const { captcha, captchaAnswer, captchaError, captchaDialogOpen, setCaptchaAnswer, setCaptchaDialogOpen, generateCaptcha, verifyCaptcha } = useCaptcha();
 
@@ -31,8 +33,19 @@ export default function Login({ status }: LoginProps) {
         setData(field, value as never);
     };
 
+    // Pindahkan error Laravel ke banner yang lebih mencolok
+    useEffect(() => {
+        const firstError = errors.username || errors.password;
+        if (firstError) {
+            setErrorBanner(firstError);
+        }
+    }, [errors.username, errors.password]);
+
+    const clearError = () => setErrorBanner(null);
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+        setErrorBanner(null);
         generateCaptcha();
         setCaptchaDialogOpen(true);
     };
@@ -44,11 +57,14 @@ export default function Login({ status }: LoginProps) {
         setIsSubmitting(true);
         startCountdown();
 
+        const targetRoute = isAdmin ? route('admin.login.store') : route('login');
+
         setTimeout(() => {
-            post(route('login'), {
+            post(targetRoute, {
                 onFinish: () => {
                     reset('password');
                     setIsSubmitting(false);
+                    resetCountdown();
                 },
             });
         }, 3000);
@@ -56,7 +72,7 @@ export default function Login({ status }: LoginProps) {
 
     return (
         <>
-            <Head title={`Login - PEMIRA ${pemiraYear}`} />
+            <Head title={`Login ${isAdmin ? 'Admin' : 'Mahasiswa'} - PEMIRA ${pemiraYear}`} />
 
             <style dangerouslySetInnerHTML={{ __html: LOGIN_STYLES }} />
 
@@ -107,13 +123,41 @@ export default function Login({ status }: LoginProps) {
                     <div className="w-full max-w-md">
                         <div className="mb-8 text-center">
                             <img src={LogoJayanusa} alt="Logo Jayanusa" className="mx-auto mb-6 h-24 w-auto" />
-                            <h2 className="mb-2 text-3xl font-bold text-gray-800">Selamat Datang</h2>
-                            <p className="text-gray-600">Silakan login untuk melanjutkan ke sistem voting</p>
+                            <h2 className="mb-2 text-3xl font-bold text-gray-800">
+                                {isAdmin ? 'Login Admin' : 'Selamat Datang'}
+                            </h2>
+                            <p className="text-gray-600">
+                                {isAdmin
+                                    ? 'Silakan masuk dengan akun administrator Anda.'
+                                    : 'Silakan login untuk melanjutkan ke sistem voting'}
+                            </p>
                         </div>
 
                         {status && (
-                            <div className="mb-4 rounded-lg bg-green-50 p-4 text-sm text-green-600">
+                            <div className="mb-4 flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700">
+                                <div className="mt-0.5 h-2 w-2 flex-shrink-0 rounded-full bg-green-600" />
                                 <p>{status}</p>
+                            </div>
+                        )}
+
+                        {errorBanner && (
+                            <div
+                                role="alert"
+                                className="mb-4 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 shadow-sm animate-in fade-in slide-in-from-top-2"
+                            >
+                                <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
+                                <div className="flex-1">
+                                    <p className="font-semibold">Login Gagal</p>
+                                    <p className="mt-0.5 text-red-600">{errorBanner}</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={clearError}
+                                    className="text-red-400 transition-colors hover:text-red-600"
+                                    aria-label="Tutup"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
                             </div>
                         )}
 
@@ -123,6 +167,7 @@ export default function Login({ status }: LoginProps) {
                                 errors={errors}
                                 processing={processing || isSubmitting}
                                 showPassword={showPassword}
+                                loginType={loginType}
                                 onDataChange={handleDataChange}
                                 onTogglePassword={() => setShowPassword(!showPassword)}
                                 onSubmit={submit}

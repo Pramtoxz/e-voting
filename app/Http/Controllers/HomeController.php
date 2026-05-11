@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Kandidat;
+use App\Models\Setting;
 
 class HomeController extends Controller
 {
@@ -19,8 +20,11 @@ class HomeController extends Controller
     public function show()
     {
         $kandidat = Kandidat::all();
+        $voteActive = Setting::getValue('vote_active', '0') === '1';
+
         return Inertia::render('Show', [
             'kandidat' => $kandidat,
+            'voteActive' => $voteActive,
         ]);
     }
 

@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, User } from 'lucide-react';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
 
@@ -30,56 +30,82 @@ export function KandidatSelectionCard({ kandidat, isSelected, onSelect }: Kandid
             }`}
             onClick={() => onSelect(kandidat)}
         >
-            <div className="relative aspect-[4/3]">
-                <div className="absolute inset-0 z-10 bg-gradient-to-b from-red-700/20 to-red-700/0"></div>
-                <div className="grid h-full grid-cols-2">
-                    <div className="relative">
-                        <img
-                            src={`/storage/${kandidat.foto_presiden}`}
-                            alt={`Kandidat ${kandidat.nomor_urut} - ${kandidat.nama_presiden}`}
-                            className="h-full w-full object-cover"
-                        />
-                    </div>
-                    <div className="relative">
-                        <img
-                            src={`/storage/${kandidat.foto_wakil}`}
-                            alt={`Kandidat ${kandidat.nomor_urut} - ${kandidat.nama_wakil}`}
-                            className="h-full w-full object-cover"
-                        />
-                    </div>
-                </div>
-                <div className="absolute top-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-700 font-bold text-white">
-                    {kandidat.nomor_urut}
+            {/* Header: Nomor Urut + Nama Paslon */}
+            <div className={`flex items-center justify-between px-5 py-3 ${isSelected ? 'bg-red-700' : 'bg-gray-100'}`}>
+                <div className="flex items-center gap-2">
+                    <span
+                        className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                            isSelected ? 'bg-white text-red-700' : 'bg-red-700 text-white'
+                        }`}
+                    >
+                        {kandidat.nomor_urut}
+                    </span>
+                    <span className={`font-bold text-base ${isSelected ? 'text-white' : 'text-gray-800'}`}>
+                        {kandidat.nama}
+                    </span>
                 </div>
                 {isSelected && (
-                    <div className="absolute top-3 left-3 z-20">
-                        <div className="rounded-full bg-green-600 p-1 text-white">
-                            <CheckCircle className="h-6 w-6" />
-                        </div>
-                    </div>
+                    <CheckCircle className="h-5 w-5 text-white" />
                 )}
             </div>
-            <div className="p-6">
-                <h3 className="text-xl font-bold text-red-700">{kandidat.nama}</h3>
-                <div className="mt-2 mb-4 grid grid-cols-2 gap-2">
-                    <div>
-                        <p className="text-sm font-semibold">{kandidat.nama_presiden}</p>
-                        <p className="text-muted-foreground text-xs">{kandidat.nomor_bp_presiden}</p>
+
+            {/* Foto Paslon */}
+            <div className="grid grid-cols-2 gap-0">
+                {/* Presiden */}
+                <div className="relative flex flex-col">
+                    <div className="aspect-[3/4] w-full overflow-hidden bg-gray-100">
+                        <img
+                            src={`/storage/${kandidat.foto_presiden}`}
+                            alt={kandidat.nama_presiden}
+                            className="h-full w-full object-cover object-top"
+                        />
                     </div>
-                    <div>
-                        <p className="text-sm font-semibold">{kandidat.nama_wakil}</p>
-                        <p className="text-muted-foreground text-xs">{kandidat.nomor_bp_wakil}</p>
+                    <div className="flex flex-col items-center bg-red-700 px-2 py-2 text-center text-white">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">Calon Ketua</span>
+                        <span className="mt-0.5 text-sm font-bold leading-tight">{kandidat.nama_presiden}</span>
+                        <span className="mt-0.5 text-xs opacity-80">{kandidat.nomor_bp_presiden}</span>
                     </div>
                 </div>
-                <p className="mb-4 line-clamp-2 text-sm italic">{kandidat.visi}</p>
+
+                {/* Wakil */}
+                <div className="relative flex flex-col">
+                    <div className="aspect-[3/4] w-full overflow-hidden bg-gray-100">
+                        <img
+                            src={`/storage/${kandidat.foto_wakil}`}
+                            alt={kandidat.nama_wakil}
+                            className="h-full w-full object-cover object-top"
+                        />
+                    </div>
+                    <div className="flex flex-col items-center bg-red-800 px-2 py-2 text-center text-white">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">Calon Wakil</span>
+                        <span className="mt-0.5 text-sm font-bold leading-tight">{kandidat.nama_wakil}</span>
+                        <span className="mt-0.5 text-xs opacity-80">{kandidat.nomor_bp_wakil}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Visi */}
+            <div className="px-5 py-4">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Visi</p>
+                <p className="line-clamp-3 text-sm text-gray-600 italic">{kandidat.visi}</p>
+            </div>
+
+            {/* Tombol */}
+            <div className="px-5 pb-5">
                 <Button
                     variant={isSelected ? 'default' : 'outline'}
-                    className={`w-full ${
-                        isSelected ? 'bg-red-700 text-white' : 'border-red-700 text-red-700 hover:bg-red-50'
+                    className={`w-full font-semibold ${
+                        isSelected
+                            ? 'bg-red-700 text-white hover:bg-red-800'
+                            : 'border-red-700 text-red-700 hover:bg-red-50'
                     }`}
-                    onClick={() => onSelect(kandidat)}
+                    onClick={(e) => { e.stopPropagation(); onSelect(kandidat); }}
                 >
-                    {isSelected ? 'Kandidat Terpilih' : 'Pilih Kandidat'}
+                    {isSelected ? (
+                        <><CheckCircle className="mr-2 h-4 w-4" /> Kandidat Terpilih</>
+                    ) : (
+                        <><User className="mr-2 h-4 w-4" /> Pilih Kandidat</>
+                    )}
                 </Button>
             </div>
         </Card>

@@ -43,7 +43,7 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
     const [timeRemaining, setTimeRemaining] = useState({
         days: 0,
         hours: 0,
-        minutes: 0,
+        minutes: 0, 
         seconds: 0,
     });
     const [countdownFinished, setCountdownFinished] = useState(false);

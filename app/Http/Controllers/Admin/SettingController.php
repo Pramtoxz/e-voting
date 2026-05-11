@@ -24,15 +24,36 @@ class SettingController extends Controller
             $showVotingResults = Setting::getValue('show_voting_results', '0');
             $countdownEndTime = Setting::getValue('countdown_end_time', now()->addDays(1)->toDateTimeString());
             $countdownActive = Setting::getValue('countdown_active', '0');
+            $voteActive = Setting::getValue('vote_active', '0');
 
             return Inertia::render('Admin/Settings', [
                 'showVotingResults' => $showVotingResults,
                 'countdownEndTime' => $countdownEndTime,
                 'countdownActive' => $countdownActive,
+                'voteActive' => $voteActive,
             ]);
         } catch (\Exception $e) {
             Log::error('Error saat menampilkan halaman pengaturan: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menampilkan pengaturan.');
+        }
+    }
+
+    /**
+     * Toggle status vote active
+     */
+    public function toggleVoteActive(Request $request)
+    {
+        try {
+            $current = Setting::getValue('vote_active', '0');
+            $newValue = $current === '1' ? '0' : '1';
+
+            Setting::where('key', 'vote_active')->update(['value' => $newValue]);
+
+            $status = $newValue === '1' ? 'dibuka' : 'ditutup';
+            return redirect()->route('settings.index')->with('success', "Voting berhasil {$status}.");
+        } catch (\Exception $e) {
+            Log::error('Error saat toggle vote active: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengubah status voting.');
         }
     }
 

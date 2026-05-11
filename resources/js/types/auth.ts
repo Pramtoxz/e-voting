@@ -1,3 +1,5 @@
+export type LoginType = 'mahasiswa' | 'admin';
+
 export interface LoginForm {
     username: string;
     password: string;
@@ -8,6 +10,7 @@ export interface LoginForm {
 export interface LoginProps {
     status?: string;
     canResetPassword: boolean;
+    loginType?: LoginType;
 }
 
 export interface Captcha {
