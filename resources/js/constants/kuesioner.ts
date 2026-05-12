@@ -1,5 +1,6 @@
 import DitoImage from '@/assets/dito.jpg';
 import RafiImage from '@/assets/rafi.jpg';
+import AldoImage from '@/assets/aldo.jpeg';
 import { Developer } from '@/types/kuesioner';
 
 export const DEVELOPERS: Developer[] = [
@@ -16,6 +17,13 @@ export const DEVELOPERS: Developer[] = [
         photo: DitoImage,
         github: 'https://github.com/Pramtoxz',
         instagram: 'https://instagram.com/pramuditometra',
+    },
+    {
+        name: 'Aldo Adytia Putra',
+        role: 'Full Stack Developer',
+        photo: AldoImage,
+        github: 'https://github.com/aldo-techsupport',
+        instagram: 'https://instagram.com/aldo6816',
     },
 ];
 
