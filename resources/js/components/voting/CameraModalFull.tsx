@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Camera, RefreshCcw, Smile, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Camera, ChevronDown, RefreshCcw, Smile, X } from 'lucide-react';
 import Button from '@/components/Button';
 import { useCameraLogic } from '@/hooks/voting/useCameraLogic';
 
@@ -11,6 +11,10 @@ interface CameraModalFullProps {
 }
 
 export default function CameraModalFull({ show, onClose, onCapture, pemiraYear }: CameraModalFullProps) {
+    const modalContentRef = useRef<HTMLDivElement>(null);
+    const captureBarRef = useRef<HTMLDivElement>(null);
+    const [showScrollHint, setShowScrollHint] = useState(false);
+
     const {
         videoRef,
         canvasRef,
@@ -43,11 +47,47 @@ export default function CameraModalFull({ show, onClose, onCapture, pemiraYear }
         };
     }, [show]);
 
+    // Deteksi apakah tombol foto tertutup (perlu scroll)
+    useEffect(() => {
+        if (!show || !cameraActive) {
+            setShowScrollHint(false);
+            return;
+        }
+
+        const container = modalContentRef.current;
+        const bar = captureBarRef.current;
+        if (!container || !bar) return;
+
+        const check = () => {
+            const containerRect = container.getBoundingClientRect();
+            const barRect = bar.getBoundingClientRect();
+            // Tombol tertutup kalau bawahnya melewati bawah container yang scrollable
+            const hidden = barRect.bottom > containerRect.bottom + 4;
+            setShowScrollHint(hidden);
+        };
+
+        check();
+        const onScroll = () => check();
+        container.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', check);
+        const interval = setInterval(check, 500);
+
+        return () => {
+            container.removeEventListener('scroll', onScroll);
+            window.removeEventListener('resize', check);
+            clearInterval(interval);
+        };
+    }, [show, cameraActive]);
+
+    const scrollToCapture = () => {
+        captureBarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    };
+
     if (!show) return null;
 
     return (
         <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black">
-            <div className="camera-modal-content relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg bg-white">
+            <div ref={modalContentRef} className="camera-modal-content relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg bg-white">
                 <div className="flex items-center justify-between border-b border-gray-200 p-4">
                     <h3 className="text-lg font-semibold text-gray-800">Ambil Foto Selfi</h3>
                     <button onClick={onClose} className="rounded-full p-1 transition-colors hover:bg-gray-200">
@@ -97,7 +137,7 @@ export default function CameraModalFull({ show, onClose, onCapture, pemiraYear }
                     )}
                 </div>
 
-                <div className="flex justify-center border-t border-gray-200 p-4">
+                <div ref={captureBarRef} className="flex justify-center border-t border-gray-200 p-4">
                     {cameraActive && (
                         <div className="flex items-center space-x-4">
                             <Button
@@ -122,6 +162,18 @@ export default function CameraModalFull({ show, onClose, onCapture, pemiraYear }
                 </div>
             </div>
 
+            {/* Hint scroll ke tombol foto — muncul bila tombol tertutup viewport */}
+            {showScrollHint && (
+                <button
+                    type="button"
+                    onClick={scrollToCapture}
+                    className="fixed bottom-4 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-red-900/40 transition hover:bg-red-700 animate-scroll-hint"
+                >
+                    <ChevronDown className="h-4 w-4 animate-bounce" />
+                    Scroll ke tombol foto
+                </button>
+            )}
+
             <style
                 dangerouslySetInnerHTML={{
                     __html: `
@@ -133,6 +185,15 @@ export default function CameraModalFull({ show, onClose, onCapture, pemiraYear }
               
               .animate-flash {
                 animation: flash 0.5s ease-out;
+              }
+
+              @keyframes scroll-hint-pulse {
+                0%, 100% { transform: translate(-50%, 0) scale(1); box-shadow: 0 10px 25px rgba(127, 29, 29, 0.4); }
+                50%      { transform: translate(-50%, -4px) scale(1.04); box-shadow: 0 14px 30px rgba(127, 29, 29, 0.6); }
+              }
+
+              .animate-scroll-hint {
+                animation: scroll-hint-pulse 1.6s ease-in-out infinite;
               }
             `,
                 }}

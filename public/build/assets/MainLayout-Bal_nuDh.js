@@ -1,0 +1,1 @@
+import{j as s}from"./app-CDru0cjM.js";import{N as i,F as m}from"./Navbar-Uw4FJrB1.js";import"./avatar-CUvalcr-.js";function t({children:e,auth:r,showFooter:o=!0}){return s.jsxs("div",{className:"flex min-h-screen flex-col bg-gray-50",children:[s.jsx(i,{user:r==null?void 0:r.user}),e,o&&s.jsx(m,{})]})}export{t as M};
