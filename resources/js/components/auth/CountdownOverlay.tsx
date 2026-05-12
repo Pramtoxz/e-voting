@@ -1,4 +1,5 @@
-import { Loader2 } from 'lucide-react';
+import Lottie from 'lottie-react';
+import { useEffect, useState } from 'react';
 
 interface CountdownOverlayProps {
     show: boolean;
@@ -6,6 +7,16 @@ interface CountdownOverlayProps {
 }
 
 export default function CountdownOverlay({ show, countdown }: CountdownOverlayProps) {
+    const [animationData, setAnimationData] = useState<unknown>(null);
+
+    useEffect(() => {
+        if (!show || animationData) return;
+        fetch('/animation/loading.json')
+            .then((res) => res.json())
+            .then((data) => setAnimationData(data))
+            .catch((err) => console.error('Gagal memuat animasi loading:', err));
+    }, [show, animationData]);
+
     if (!show) return null;
 
     const isProcessing = countdown <= 0;
@@ -13,16 +24,14 @@ export default function CountdownOverlay({ show, countdown }: CountdownOverlayPr
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
             <div className="text-center">
-                <div className="mb-4 flex h-32 w-32 items-center justify-center rounded-full border-8 border-red-600 bg-white">
-                    {isProcessing ? (
-                        <Loader2 className="h-16 w-16 animate-spin text-red-600" />
+                <div className="mx-auto mb-4 flex h-48 w-48 items-center justify-center">
+                    {animationData ? (
+                        <Lottie animationData={animationData} loop autoplay className="h-full w-full" />
                     ) : (
-                        <span className="text-6xl font-bold text-red-600">{countdown}</span>
+                        <div className="h-16 w-16 animate-spin rounded-full border-4 border-white/30 border-t-red-500" />
                     )}
                 </div>
-                <p className="text-xl font-semibold text-white">
-                    {isProcessing ? 'Memverifikasi akun...' : 'Memproses login...'}
-                </p>
+                <p className="text-xl font-semibold text-white">{isProcessing ? 'Memverifikasi akun...' : 'Memproses login...'}</p>
             </div>
         </div>
     );
