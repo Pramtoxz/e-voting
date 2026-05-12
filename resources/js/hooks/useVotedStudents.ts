@@ -32,7 +32,7 @@ export function useVotedStudents() {
             // Tambah ke list mahasiswa
             setVotedStudents((prev) => {
                 if (prev.some((s) => s.id === next.id)) return prev;
-                return [next, ...prev].slice(0, 50);
+                return [next, ...prev];
             });
 
             // Tambah toast notifikasi

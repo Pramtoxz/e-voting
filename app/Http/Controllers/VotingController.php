@@ -134,7 +134,6 @@ class VotingController extends Controller
     {
         $votes = Vote::with(['user', 'kandidat'])
             ->orderBy('created_at', 'desc')
-            ->take(20)
             ->get()
             ->map(function ($vote) {
                 // Format timestamp (created_at)
