@@ -47,7 +47,6 @@ const STAGES = [
 
 export default function DramaticReveal({ kandidat, totalVotes, onFinish }: DramaticRevealProps) {
     const [stage, setStage] = useState(0);
-    const [skipped, setSkipped] = useState(false);
 
     const sorted = [...kandidat].sort((a, b) => b.jumlah_suara - a.jumlah_suara);
     const winner = sorted[0];
@@ -57,19 +56,13 @@ export default function DramaticReveal({ kandidat, totalVotes, onFinish }: Drama
     const selisih = winnerPct - runnerUpPct;
 
     useEffect(() => {
-        if (skipped) return;
         if (stage >= STAGES.length) {
             onFinish();
             return;
         }
         const timer = setTimeout(() => setStage((s) => s + 1), STAGES[stage].dur);
         return () => clearTimeout(timer);
-    }, [stage, skipped, onFinish]);
-
-    const handleSkip = () => {
-        setSkipped(true);
-        onFinish();
-    };
+    }, [stage, onFinish]);
 
     const selisihText =
         selisih < 2 ? 'Selisihnya tipiiiiis banget...' : selisih < 10 ? 'Selisihnya lumayan tipis... hati-hati' : 'Selisihnya lumayan jauh...';
@@ -117,21 +110,6 @@ export default function DramaticReveal({ kandidat, totalVotes, onFinish }: Drama
                 transition={{ duration: 1, delay: 0.2 }}
                 className="absolute right-0 bottom-0 left-0 z-40 bg-black"
             />
-
-            {/* Skip */}
-            <button
-                onClick={handleSkip}
-                className="absolute top-[10vh] right-6 z-50 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/20 hover:text-white"
-            >
-                Lewati ›
-            </button>
-
-            {/* Progress dots */}
-            <div className="absolute top-[10vh] left-1/2 z-50 flex -translate-x-1/2 gap-1">
-                {STAGES.map((_, i) => (
-                    <div key={i} className={`h-1 rounded-full transition-all duration-700 ${i <= stage ? 'w-5 bg-white' : 'w-2 bg-white/30'}`} />
-                ))}
-            </div>
 
             <div className="relative z-10 flex h-full w-full items-center justify-center px-6">
                 <AnimatePresence mode="wait">

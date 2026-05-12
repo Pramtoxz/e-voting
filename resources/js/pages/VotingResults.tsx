@@ -230,7 +230,7 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
     // Tampilkan countdown jika showCountdown true dan countdown belum selesai
     if (showCountdown && !countdownFinished) {
         return (
-            <Layout title={`Pengumuman Hasil Voting - PEMIRA ${pemiraYear}`} auth={auth}>
+            <>
                 <Head title={`Pengumuman Hasil Voting - PEMIRA ${pemiraYear}`} />
 
                 {/* CSS untuk animasi */}
@@ -312,7 +312,7 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
                         </div>
                     </div>
                 </div>
-            </Layout>
+            </>
         );
     }
 
