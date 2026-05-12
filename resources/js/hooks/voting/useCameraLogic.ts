@@ -107,25 +107,33 @@ export function useCameraLogic({ pemiraYear, onPhotoCapture }: UseCameraLogicPro
         const container = canvas.parentElement;
         if (container) {
             const containerWidth = container.clientWidth;
-            canvas.width = containerWidth;
-            canvas.height = containerWidth * 0.75;
-
             const videoRatio = video.videoWidth / video.videoHeight;
-            let drawWidth = canvas.width;
-            let drawHeight = canvas.width / videoRatio;
 
-            if (drawHeight > canvas.height) {
-                drawHeight = canvas.height;
-                drawWidth = drawHeight * videoRatio;
+            // Aspect ratio canvas adaptif: portrait untuk kamera HP, landscape untuk webcam desktop
+            const canvasRatio = videoRatio < 1 ? 3 / 4 : 4 / 3;
+            canvas.width = containerWidth;
+            canvas.height = containerWidth / canvasRatio;
+
+            // Cover crop: crop video supaya fill canvas tanpa stretch
+            let sourceX = 0;
+            let sourceY = 0;
+            let sourceWidth = video.videoWidth;
+            let sourceHeight = video.videoHeight;
+
+            if (videoRatio > canvasRatio) {
+                // Video lebih lebar — crop kiri-kanan
+                sourceWidth = video.videoHeight * canvasRatio;
+                sourceX = (video.videoWidth - sourceWidth) / 2;
+            } else {
+                // Video lebih tinggi — crop atas-bawah
+                sourceHeight = video.videoWidth / canvasRatio;
+                sourceY = (video.videoHeight - sourceHeight) / 2;
             }
-
-            const offsetX = (canvas.width - drawWidth) / 2;
-            const offsetY = 0;
 
             // Flip horizontal untuk preview (agar tidak mirror)
             context.save();
             context.scale(-1, 1);
-            context.drawImage(video, -offsetX - drawWidth, offsetY, drawWidth, drawHeight);
+            context.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, -canvas.width, 0, canvas.width, canvas.height);
             context.restore();
 
             drawPhotoFrame(context, canvas.width, canvas.height);
@@ -149,7 +157,11 @@ export function useCameraLogic({ pemiraYear, onPhotoCapture }: UseCameraLogicPro
         }
 
         const constraints = {
-            video: { facingMode: 'user' },
+            video: {
+                facingMode: 'user',
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+            },
             audio: false,
         };
 
@@ -276,16 +288,40 @@ export function useCameraLogic({ pemiraYear, onPhotoCapture }: UseCameraLogicPro
 
         if (!context) return;
 
-        canvas.width = canvas.clientWidth || 320;
-        canvas.height = (canvas.clientWidth || 320) * 0.75;
+        const setCanvasSize = () => {
+            const width = canvas.clientWidth || 320;
+            const vw = videoElement.videoWidth || 1280;
+            const vh = videoElement.videoHeight || 720;
+            const videoRatio = vw / vh;
+            const canvasRatio = videoRatio < 1 ? 3 / 4 : 4 / 3;
+            canvas.width = width;
+            canvas.height = width / canvasRatio;
+            return { videoRatio, canvasRatio };
+        };
 
         const renderEmergencyLoop = () => {
             if (!canvasRef.current) return;
 
+            const { videoRatio, canvasRatio } = setCanvasSize();
+
+            // Cover crop supaya tidak gepeng
+            let sourceX = 0;
+            let sourceY = 0;
+            let sourceWidth = videoElement.videoWidth || 1280;
+            let sourceHeight = videoElement.videoHeight || 720;
+
+            if (videoRatio > canvasRatio) {
+                sourceWidth = sourceHeight * canvasRatio;
+                sourceX = ((videoElement.videoWidth || 1280) - sourceWidth) / 2;
+            } else {
+                sourceHeight = sourceWidth / canvasRatio;
+                sourceY = ((videoElement.videoHeight || 720) - sourceHeight) / 2;
+            }
+
             // Flip horizontal untuk preview (agar tidak mirror)
             context.save();
             context.scale(-1, 1);
-            context.drawImage(videoElement, -canvas.width, 0, canvas.width, canvas.height);
+            context.drawImage(videoElement, sourceX, sourceY, sourceWidth, sourceHeight, -canvas.width, 0, canvas.width, canvas.height);
             context.restore();
 
             drawPhotoFrame(context, canvas.width, canvas.height);

@@ -45,7 +45,7 @@ const PARTNERSHIP = {
 };
 
 // Interval: 5 detik untuk testing, ubah ke 5 * 60 * 1000 untuk produksi (5 menit)
-const AD_INTERVAL = 1 * 60 * 1000;
+const AD_INTERVAL = 1 * 50 * 1000;
 const AD_DISPLAY_DURATION = 7000;
 
 // Showcase interval: per 1 menit, tampil 30 detik (visi 15 + misi 15)

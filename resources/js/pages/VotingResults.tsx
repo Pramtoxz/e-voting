@@ -1,5 +1,6 @@
 ﻿import GarudaImage from '@/assets/garuda.webp';
 import DramaticReveal from '@/components/voting-results/DramaticReveal';
+import FestiveEffects from '@/components/voting-results/FestiveEffects';
 import Layout from '@/Layout/MainLayout';
 import { getPemiraYear } from '@/utils/date';
 import { Head } from '@inertiajs/react';
@@ -398,6 +399,9 @@ export default function VotingResults({ kandidat, totalVotes, totalVoters, showR
 
             {/* Full viewport — tidak pakai Layout agar tidak ada navbar */}
             <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-gradient-to-br from-red-950 via-red-900 to-red-800">
+                {/* Efek meriah looping */}
+                {!showReveal && <FestiveEffects />}
+
                 {/* Batik pattern */}
                 <div
                     className="absolute inset-0 opacity-[0.07]"
